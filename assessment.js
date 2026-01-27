@@ -234,9 +234,9 @@ class AITransformationAssessment {
                 <div class="stages-progression">
                     <div class="stage-summary stage-1" data-stage="1" onclick="window.assessmentTool.showStageDetail(1)" style="cursor: pointer;">
                         <div class="bike-icon" id="bike-stage-1"></div>
-                        <h3>1. Getting on the Bike</h3>
+                        <h3>1. Unboxing & Assembling</h3>
                         <p class="stage-subtitle">foundations</p>
-                        <p class="stage-brief">Cautious & experimenting. Learning what AI can do.</p>
+                        <p class="stage-brief">Getting access, learning basics, understanding what AI can do</p>
                     </div>
                     
                     <div class="stage-arrow">→</div>
@@ -245,7 +245,7 @@ class AITransformationAssessment {
                         <div class="bike-icon" id="bike-stage-2"></div>
                         <h3>2. Riding with Training Wheels</h3>
                         <p class="stage-subtitle">safe adoption</p>
-                        <p class="stage-brief">AI with guardrails & oversight. Building confidence.</p>
+                        <p class="stage-brief">AI use with guardrails & oversight. Building confidence.</p>
                     </div>
                     
                     <div class="stage-arrow">→</div>
@@ -327,7 +327,7 @@ class AITransformationAssessment {
             2: {
                 title: "Stage 2: Riding with Training Wheels",
                 subtitle: "safe adoption", 
-                description: "People are riding confidently, but the bike keeps them upright. Helmets are on, rules are clear, and falls are unlikely.",
+                description: "People are riding confidently, but the training wheels keep them upright. Helmets are on, rules are being learned, and falls are unlikely.",
                 whatItLooks: [
                     "AI is used regularly with clear guardrails",
                     "People know what's allowed, what to check, and when to double-check results"
@@ -340,7 +340,7 @@ class AITransformationAssessment {
             3: {
                 title: "Stage 3: Training Wheels Off",
                 subtitle: "operating differently",
-                description: "The training wheels are gone. People can ride on their own, but they're still thinking about balance, signals, and traffic.",
+                description: "The training wheels are gone. People can ride on their own, but they're still thinking about maintaing balance, and the right hand signals.",
                 whatItLooks: [
                     "This is a turning point: workflows are changing, AI is assumed rather than optional",
                     "Human oversight remains essential, and people are rethinking work processes"
@@ -353,7 +353,7 @@ class AITransformationAssessment {
             4: {
                 title: "Stage 4: Making the Bike Yours",
                 subtitle: "designed for our business",
-                description: "The bike is being modified on purpose—basket, seat, paint, handlebars. Each upgrade changes how it feels, and riders are adapting.",
+                description: "The bike is being modified on purpose — adding a basket or beads on the spokes, customizing the seat, paint, and handlebars. Each upgrade changes how it feels, and riders are adapting.",
                 whatItLooks: [
                     "Teams now create purpose-built agents, automations, and integrations with AI embedded directly into workflows",
                     "These are deliberate, not experimental, solutions"
@@ -486,7 +486,7 @@ class AITransformationAssessment {
             2: {
                 title: "Stage 2: Riding with Training Wheels",
                 subtitle: "safe adoption", 
-                description: "People are riding confidently, but the bike keeps them upright. Helmets are on, rules are clear, and falls are unlikely.",
+                description: "People are riding confidently, but the training wheels keep them upright. Helmets are on, rules are being learned, and falls are unlikely.",
                 whatItLooks: [
                     "AI is used regularly with clear guardrails",
                     "People know what's allowed, what to check, and when to double-check results",
@@ -511,7 +511,7 @@ class AITransformationAssessment {
             3: {
                 title: "Stage 3: Training Wheels Off",
                 subtitle: "operating differently",
-                description: "The training wheels are gone. People can ride on their own, but they're still thinking about balance, signals, and traffic.",
+                description: "The training wheels are gone. People can ride on their own, but they're still thinking about maintaining balance, and proper hand signals.",
                 whatItLooks: [
                     "This is a turning point: workflows are changing, AI is assumed rather than optional",
                     "Human oversight remains essential, and people are rethinking work processes"
@@ -535,7 +535,7 @@ class AITransformationAssessment {
             4: {
                 title: "Stage 4: Making the Bike Yours",
                 subtitle: "designed for our business",
-                description: "The bike is being modified on purpose—basket, seat, paint, handlebars. Each upgrade changes how it feels, and riders are adapting.",
+                description: "The bike is being modified on purpose — adding a basket, customizing the seat, paint, and handlebars. Each upgrade changes how it feels, and riders are adapting.",
                 whatItLooks: [
                     "Teams now create purpose-built agents, automations, and integrations with AI embedded directly into workflows",
                     "These are deliberate, not experimental, solutions"
@@ -593,7 +593,7 @@ class AITransformationAssessment {
                     </div>
                     
                     <div class="detail-section">
-                        <h3>What people are saying</h3>
+                        <h3>What it sounds like</h3>
                         <ul>
                             ${stageData.peopleAreSaying.map(item => `<li>${item}</li>`).join('')}
                         </ul>
