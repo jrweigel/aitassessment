@@ -22,7 +22,15 @@ app.http('submit-assessment', {
         try {
             const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
             if (!connectionString) {
-                throw new Error('Azure Storage connection string not configured');
+                context.log('Azure Storage connection string not configured');
+                return {
+                    status: 503,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ 
+                        error: 'Storage not configured. Data will be saved locally.',
+                        code: 'STORAGE_NOT_CONFIGURED'
+                    })
+                };
             }
 
             // Parse request body

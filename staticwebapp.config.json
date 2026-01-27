@@ -1,24 +1,24 @@
 {
   "routes": [
     {
-      "route": "/admin/*",
-      "allowedRoles": ["authenticated"]
+      "route": "/admin",
+      "rewrite": "/admin/index.html"
+    },
+    {
+      "route": "/admin/*"
     },
     {
       "route": "/api/*",
       "methods": ["GET", "POST", "DELETE", "OPTIONS"]
     }
   ],
-  "responseOverrides": {
-    "401": {
-      "redirect": "/login",
-      "statusCode": 302
-    }
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/admin/*", "/api/*", "*.{css,js,png,jpg,gif,ico}"]
   },
   "platform": {
     "apiRuntime": "node:18"
   },
-  "trailingSlash": "auto",
   "globalHeaders": {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
