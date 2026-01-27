@@ -1,21 +1,4 @@
 {
-  "routes": [
-    {
-      "route": "/admin",
-      "rewrite": "/admin/index.html"
-    },
-    {
-      "route": "/admin/*"
-    },
-    {
-      "route": "/api/*",
-      "methods": ["GET", "POST", "DELETE", "OPTIONS"]
-    }
-  ],
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/admin/*", "/api/*", "*.{css,js,png,jpg,gif,ico}"]
-  },
   "platform": {
     "apiRuntime": "node:18"
   },
