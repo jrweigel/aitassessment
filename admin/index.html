@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AX&E AI Transformation - Admin View</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../dashboard.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <header>
+        <h1>AX&E AI Transformation - Admin View</h1>
+        <p class="subtitle">Internal tracking with manager names and detailed analytics</p>
+        <nav class="header-nav">
+            <a href="../index.html">← Back to Assessment</a>
+            <a href="../dashboard.html">Public Dashboard</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="admin-warning">
+            <div class="warning-box">
+                <h3>⚠️ Internal Use Only</h3>
+                <p>This view contains manager names and detailed team information. Do not share publicly.</p>
+            </div>
+        </section>
+
+        <section id="detailed-stats">
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <h3>Total Assessments</h3>
+                    <span class="stat-number" id="admin-total-assessments">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Unique Managers</h3>
+                    <span class="stat-number" id="admin-unique-managers">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Teams by Stage</h3>
+                    <div class="mini-distribution" id="admin-mini-distribution"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="assessment-log">
+            <h2>Assessment Record Log</h2>
+            <div class="search-filters">
+                <input type="text" id="manager-search" placeholder="Search by manager name...">
+                <select id="team-filter">
+                    <option value="">All Teams</option>
+                    <option value="CXS">Cloud Experience Studio</option>
+                    <option value="DevRel">Developer Relations</option>
+                    <option value="Product">AX&E Product</option>
+                    <option value="Eng">AX&E Engineering</option>
+                    <option value="Learn">Learn</option>
+                    <option value="Startups">Startups</option>
+                </select>
+                <select id="stage-filter">
+                    <option value="">All Stages</option>
+                    <option value="1">Stage 1</option>
+                    <option value="2">Stage 2</option>
+                    <option value="3">Stage 3</option>
+                    <option value="4">Stage 4</option>
+                    <option value="5">Stage 5</option>
+                </select>
+                <button id="refresh-log" class="refresh-btn">Refresh Log</button>
+            </div>
+            <div class="log-table-container">
+                <table class="log-table" id="log-table">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Manager Name</th>
+                            <th>Team</th>
+                            <th>Stage Result</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                        <!-- Assessment records will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="analytics">
+            <h2>Advanced Analytics</h2>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Stage Progression Patterns</h3>
+                    <div id="progression-analysis"></div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Team Readiness Indicators</h3>
+                    <div id="readiness-indicators"></div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Assessment Quality Metrics</h3>
+                    <div id="quality-metrics"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin-actions">
+            <h2>Admin Actions</h2>
+            <div class="admin-buttons">
+                <button id="export-detailed-csv" class="admin-btn">Export Full Data (CSV)</button>
+                <button id="export-manager-report" class="admin-btn">Manager Summary Report</button>
+                <button id="clear-all-data" class="danger-btn">Clear All Data</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p class="privacy-note">⚠️ This data contains personally identifiable information and should be handled according to privacy policies.</p>
+        <nav class="footer-nav">
+            <a href="../dashboard.html">View AX&E Dashboard</a>
+            <a href="../index.html#all-stages">See Stage Snapshot</a>
+            <a href="../index.html#framework">Explore the Framework</a>
+        </nav>
+    </footer>
+
+    <script src="admin.js"></script>
+</body>
+</html>

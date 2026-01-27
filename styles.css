@@ -1,0 +1,1153 @@
+/* AX&E AI Transformation Assessment Styles */
+
+:root {
+    /* Stage colors with accessibility patterns */
+    --stage-1: #6b7280; /* Gray */
+    --stage-2: #f97316; /* Orange */ 
+    --stage-3: #eab308; /* Yellow */
+    --stage-4: #2563eb; /* Blue */
+    --stage-5: #16a34a; /* Green */
+    
+    /* Primary colors */
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    
+    /* Base colors */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+}
+
+header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.framework-description {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stage-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.stage-card:hover,
+.stage-card:focus {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow), 0 10px 25px -5px rgb(0 0 0 / 0.1);
+    outline: none;
+}
+
+.stage-card[data-stage="1"] {
+    border-color: var(--stage-1);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-1) 10%, var(--bg-secondary)));
+}
+
+.stage-card[data-stage="2"] {
+    border-color: var(--stage-2);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-2) 10%, var(--bg-secondary)));
+}
+
+.stage-card[data-stage="3"] {
+    border-color: var(--stage-3);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-3) 10%, var(--bg-secondary)));
+}
+
+.stage-card[data-stage="4"] {
+    border-color: var(--stage-4);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-4) 10%, var(--bg-secondary)));
+}
+
+.stage-card[data-stage="5"] {
+    border-color: var(--stage-5);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-5) 10%, var(--bg-secondary)));
+}
+
+.bike-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 0.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+/* Accessibility patterns overlay */
+.bike-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    opacity: 0.3;
+}
+
+/* Stage-specific icon backgrounds and patterns */
+#bike-stage-1 {`n    background: var(--stage-1);`n    color: white;`n}`n#bike-stage-1::before {`n    content: "📦";`n    z-index: 2;`n    position: relative;`n}
+#bike-stage-1::before {
+    content: '📦';
+    z-index: 2;
+    position: relative;
+}
+#bike-stage-1::after {
+    background: repeating-linear-gradient(45deg, transparent, transparent 4px, white 4px, white 8px);
+}
+
+#bike-stage-2 {`n    background: var(--stage-2);`n    color: white;`n}`n#bike-stage-2::before {`n    content: "🚲";`n    z-index: 2;`n    position: relative;`n}
+#bike-stage-2::before {
+    content: '🚲';
+    z-index: 2;
+    position: relative;
+}
+#bike-stage-2::after {
+    background: repeating-linear-gradient(135deg, transparent, transparent 3px, white 3px, white 6px);
+}
+
+#bike-stage-3 {`n    background: var(--stage-3);`n    color: white;`n}`n#bike-stage-3::before {`n    content: "🚴";`n    z-index: 2;`n    position: relative;`n}
+#bike-stage-3::before {
+    content: '🚴';
+    z-index: 2;
+    position: relative;
+}
+#bike-stage-3::after {
+    background: radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, white 2px, transparent 2px);
+    background-size: 16px 16px;
+}
+
+#bike-stage-4 {`n    background: var(--stage-4);`n    color: white;`n}`n#bike-stage-4::before {`n    content: "🔧";`n    z-index: 2;`n    position: relative;`n}
+#bike-stage-4::before {
+    content: '🔧';
+    z-index: 2;
+    position: relative;
+}
+#bike-stage-4::after {
+    background: repeating-linear-gradient(60deg, transparent, transparent 3px, white 3px, white 4px),
+                repeating-linear-gradient(-60deg, transparent, transparent 3px, white 3px, white 4px);
+}
+
+#bike-stage-5 {`n    background: var(--stage-5);`n    color: white;`n}`n#bike-stage-5::before {`n    content: "⚡";`n    z-index: 2;`n    position: relative;`n}
+#bike-stage-5::before {
+    content: '⚡';
+    z-index: 2;
+    position: relative;
+}
+#bike-stage-5::after {
+    background: linear-gradient(45deg, white 25%, transparent 25%, transparent 75%, white 75%),
+                linear-gradient(-45deg, white 25%, transparent 25%, transparent 75%, white 75%);
+    background-size: 8px 8px;
+}
+
+.stage-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.stage-card p {
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Assessment Section */
+.hidden {
+    display: none;
+}
+
+.back-button {
+    background: var(--text-secondary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background: var(--text-primary);
+}
+
+#assessment-content {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 3rem;
+    margin-bottom: 2rem;
+}
+
+.assessment-form h2 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.question-group {
+    margin-bottom: 2rem;
+}
+
+.question-group h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.radio-option:hover {
+    border-color: var(--stage-4);
+}
+
+.radio-option input[type="radio"] {
+    margin: 0;
+}
+
+.team-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.submit-assessment {
+    background: var(--stage-4);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.submit-assessment:hover {
+    background: color-mix(in srgb, var(--stage-4) 90%, black);
+}
+
+/* Results Section */
+.stage-result {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.stage-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.actions button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+#view-dashboard {
+    background: var(--stage-5);
+    color: white;
+}
+
+#view-dashboard:hover {
+    background: color-mix(in srgb, var(--stage-5) 90%, black);
+}
+
+#retake-assessment {
+    background: var(--text-secondary);
+    color: white;
+}
+
+#retake-assessment:hover {
+    background: var(--text-primary);
+}
+
+/* Footer */
+footer {
+    background: var(--bg-secondary);
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+    margin-top: 3rem;
+}
+
+footer a {
+    color: var(--stage-4);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+.footer-nav {
+    margin-top: 1rem;
+}
+
+.footer-nav a {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.footer-nav a:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .stages-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .team-info {
+        grid-template-columns: 1fr;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .start-container {
+        padding: 2rem 1rem;
+    }
+    
+    .start-container h2 {
+        font-size: 1.8rem;
+    }
+    
+    .start-description {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .start-subdescription {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+    
+    .start-button {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+}
+
+/* Start Assessment Section */
+.start-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.start-container h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.start-description {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.start-subdescription {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+.start-button {
+    background: var(--stage-4);
+    color: white;
+    border: none;
+    padding: 1.2rem 3rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.start-button:hover {
+    background: color-mix(in srgb, var(--stage-4) 90%, black);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.15);
+}
+
+/* Stage Detail Section */
+.stage-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.stage-detail h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.stage-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--stage-4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.stage-description {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+.detail-sections {
+    display: grid;
+    gap: 2rem;
+}
+
+.detail-section {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 2rem;
+    border-left: 4px solid var(--stage-4);
+}
+
+.detail-section.warning {
+    border-left-color: #f59e0b;
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, #f59e0b 5%, var(--bg-secondary)));
+}
+
+.detail-section h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-size: 1.3rem;
+}
+
+.detail-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.detail-section li {
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+    position: relative;
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+.detail-section li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--stage-4);
+    font-weight: bold;
+}
+
+.detail-section.importance {
+    border-left-color: var(--stage-5);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-5) 5%, var(--bg-secondary)));
+}
+
+.detail-section.focus {
+    border-left-color: var(--primary);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--primary) 5%, var(--bg-secondary)));
+}
+
+.detail-section.importance p,
+.detail-section.focus p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Stage Navigation */
+.stage-nav {
+    margin: 3rem 0 2rem;
+    border-top: 2px solid var(--border-color);
+    padding-top: 2rem;
+}
+
+.stage-navigation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.nav-button {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.nav-button:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.nav-button.back-to-overview {
+    background: var(--stage-3);
+    color: white;
+    border-color: var(--stage-3);
+}
+
+.nav-button.back-to-overview:hover {
+    background: var(--stage-4);
+    border-color: var(--stage-4);
+}
+
+/* All Stages Overview */
+.stages-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.stage-overview-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.stage-overview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stage-overview-card.stage-1 { border-left: 5px solid var(--stage-1); }
+.stage-overview-card.stage-2 { border-left: 5px solid var(--stage-2); }
+.stage-overview-card.stage-3 { border-left: 5px solid var(--stage-3); }
+.stage-overview-card.stage-4 { border-left: 5px solid var(--stage-4); }
+.stage-overview-card.stage-5 { border-left: 5px solid var(--stage-5); }
+
+.stage-header h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.3rem;
+}
+
+.stage-overview-card .stage-subtitle {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--stage-4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 1rem 0;
+}
+
+.stage-overview-card .stage-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.stage-summary {
+    display: grid;
+    gap: 1rem;
+}
+
+.summary-section h4 {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.summary-section ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    list-style: none;
+}
+
+.summary-section li {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+    position: relative;
+}
+
+.summary-section li::before {
+    content: '•';
+    color: var(--primary);
+    position: absolute;
+    left: -1rem;
+}
+
+.summary-section li.more-indicator {
+    color: var(--primary);
+    font-style: italic;
+    font-weight: 500;
+}
+
+.click-to-expand {
+    text-align: center;
+    color: var(--primary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.overview-description {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+/* Stage Navigation */
+.stage-nav {
+    margin: 3rem 0 2rem;
+    border-top: 2px solid var(--border-color);
+    padding-top: 2rem;
+}
+
+.stage-navigation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.nav-button {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.nav-button:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.nav-button.back-to-overview {
+    background: var(--stage-3);
+    color: white;
+    border-color: var(--stage-3);
+}
+
+.nav-button.back-to-overview:hover {
+    background: var(--stage-4);
+    border-color: var(--stage-4);
+}
+/* All Stages Snapshot */
+.stages-snapshot {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.stages-progression {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    margin: 2rem 0;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0 1rem;
+}
+
+.stage-summary {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    min-width: 140px;
+    max-width: 160px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.stage-summary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stage-summary.stage-1 { border-top: 4px solid var(--stage-1); }
+.stage-summary.stage-2 { border-top: 4px solid var(--stage-2); }
+.stage-summary.stage-3 { border-top: 4px solid var(--stage-3); }
+.stage-summary.stage-4 { border-top: 4px solid var(--stage-4); }
+.stage-summary.stage-5 { border-top: 4px solid var(--stage-5); }
+
+.stage-summary h3 {
+    margin: 0.5rem 0 0.3rem 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.stage-summary .stage-subtitle {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.5rem 0;
+}
+
+.stage-summary .stage-brief {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.stage-arrow {
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0 0.2rem;
+    flex-shrink: 0;
+}
+
+.assessment-prompt {
+    background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.assessment-prompt h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+}
+
+.key-question {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0 0 2rem 0;
+    font-style: italic;
+}
+
+.progress-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.indicator-icon {
+    font-size: 1.5rem;
+}
+
+.framework-guidance {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.guidance-section {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.guidance-section.highlight {
+    border-left: 5px solid var(--stage-3);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-3) 5%, var(--bg-secondary)));
+}
+
+.guidance-section.success {
+    border-left: 5px solid var(--stage-5);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--stage-5) 5%, var(--bg-secondary)));
+}
+
+.guidance-section h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.guidance-section ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    list-style: none;
+}
+
+.guidance-section li {
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    position: relative;
+}
+
+.guidance-section li::before {
+    content: '•';
+    color: var(--primary);
+    position: absolute;
+    left: -1rem;
+    font-weight: bold;
+}
+
+.snapshot-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 3rem 0 1rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.action-btn.primary {
+    background: var(--primary);
+    color: white;
+}
+
+.action-btn.primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.action-btn.secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.action-btn.secondary:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .stages-progression {
+        gap: 0.3rem;
+        padding: 0 0.5rem;
+    }
+    
+    .stage-summary {
+        min-width: 120px;
+        max-width: 140px;
+        padding: 0.8rem;
+    }
+    
+    .stage-summary h3 {
+        font-size: 0.8rem;
+    }
+    
+    .stage-summary .stage-subtitle {
+        font-size: 0.6rem;
+    }
+    
+    .stage-summary .stage-brief {
+        font-size: 0.7rem;
+    }
+    
+    .stage-arrow {
+        font-size: 1rem;
+        margin: 0 0.1rem;
+    }
+    
+    .bike-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .progress-indicators {
+        gap: 1.5rem;
+    }
+    
+    .guidance-section {
+        padding: 1rem;
+    }
+}
+
+/* Final Stage Selection */
+.final-stage-selection {
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.final-stage-selection h4 {
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.stage-options {
+    margin: 1.5rem 0;
+}
+
+.stage-option {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.stage-option:hover {
+    border-color: var(--primary);
+    background: var(--bg-secondary);
+}
+
+.stage-option.recommended {
+    border-color: var(--primary);
+    background: linear-gradient(145deg, var(--bg-secondary), color-mix(in srgb, var(--primary) 10%, var(--bg-secondary)));
+}
+
+.stage-option-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.stage-option-header input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.stage-option-header label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.stage-option .stage-badge {
+    margin: 0;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+
+.recommended-tag {
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.stage-option-description {
+    margin-left: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Assessment Complete */
+.assessment-complete {
+    text-align: center;
+    padding: 2rem;
+}
+
+.success-message {
+    margin-bottom: 2rem;
+}
+
+.success-message h3 {
+    color: var(--stage-5);
+    margin-bottom: 1rem;
+}
+
+.next-steps {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.next-steps h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+

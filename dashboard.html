@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AX&E AI Transformation Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <header>
+        <h1>AX&E AI Transformation Dashboard</h1>
+        <p class="subtitle">Org view across all teams</p>
+        <div class="dashboard-context">
+            <p>Remember that teams ride different bikes at different speeds; that's normal. The org doesn't move as one bike; variation is expected and healthy.</p>
+        </div>
+        <nav class="header-nav">
+            <a href="index.html">← Back to Assessment</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="dashboard-overview">
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>Total Assessments</h3>
+                    <span class="stat-number" id="total-assessments">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Teams Assessed</h3>
+                    <span class="stat-number" id="teams-assessed">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Latest Assessment</h3>
+                    <span class="stat-date" id="latest-assessment">No data</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="team-distribution">
+            <h2>AI Transformation by AX&E Team</h2>
+            <div class="team-grid" id="team-grid">
+                <!-- Team distribution will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <section id="stage-distribution">
+            <h2>Overall Stage Distribution</h2>
+            <div class="stage-breakdown" id="stage-breakdown">
+                <!-- Stage breakdown will be populated by JavaScript -->
+            </div>
+            <div class="distribution-chart" id="distribution-chart">
+                <!-- Simple visual chart will be generated here -->
+            </div>
+        </section>
+
+        <section id="recent-assessments">
+            <h2>Recent Assessment Activity</h2>
+            <div class="assessment-timeline" id="assessment-timeline">
+                <!-- Recent assessments (anonymized) will be shown here -->
+            </div>
+        </section>
+
+        <section id="export-actions">
+            <h2>Export & Analysis</h2>
+            <div class="export-buttons">
+                <button id="export-csv" class="export-btn">Export to CSV</button>
+                <button id="export-summary" class="export-btn">Download Summary Report</button>
+                <button id="refresh-data" class="refresh-btn">Refresh Data</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p class="privacy-note">All data is anonymized for organizational privacy</p>
+        <nav class="footer-nav">
+            <a href="dashboard.html">View AX&E Dashboard</a>
+            <a href="index.html#stages-overview">See Stage Snapshot</a>
+        </nav>
+    </footer>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

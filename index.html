@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AX&E AI Transformation Assessment</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>AX&E AI Transformation Progress</h1>
+        <p class="subtitle">How is your team progressing in their AI transformation journey?</p>
+    </header>
+
+    <main>
+        <section id="start-assessment">
+            <div class="start-container">
+                <h2>Start Here: Assess Your Team's Transformation Progress</h2>
+                <p class="start-description">
+                    To help quickly track our progress on our AI transformation journey, we're using a simple 5-stage approach. 
+                    <strong>AI transformation is like learning to ride a bike</strong> - progress is measured by muscle memory and how much you still have to think about "balance" when using AI.
+                </p>
+                <p class="start-subdescription">
+                    Answer a few questions about your team's current AI usage to discover where you are in the transformation journey.
+                </p>
+                <button id="begin-assessment" class="start-button" onclick="startAssessment()">Begin Assessment</button>
+            </div>
+        </section>
+
+        <section id="assessment-section" class="hidden">
+            <button id="back-to-start" class="back-button">← Back to Start</button>
+            <div id="assessment-content">
+                <!-- Assessment content will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <section id="framework-overview" class="hidden">
+            <h2>AI Transformation Framework: Learning to Ride the AI Bike</h2>
+            <p class="framework-description">
+                Diagnosed by muscle memory: how much do we have to think about balance? Progress is wobbling less, thinking less, trusting more. 
+                Click each stage to learn more about what it looks like in practice.
+            </p>
+            
+            <div class="stages-grid">
+                <div class="stage-card" data-stage="1" tabindex="0" role="button">
+                    <h3>1. Unboxing & Assembling</h3>
+                    <p>Getting access, learning basics, understanding what AI can do</p>
+                </div>
+
+                <div class="stage-card" data-stage="2" tabindex="0" role="button">
+                    <h3>2. Riding with Training Wheels</h3>
+                    <p>Regular use with guardrails, humans firmly in control</p>
+                </div>
+
+                <div class="stage-card" data-stage="3" tabindex="0" role="button">
+                    <h3>3. Training Wheels Off</h3>
+                    <p>Independent operation but still thinking about balance</p>
+                </div>
+
+                <div class="stage-card" data-stage="4" tabindex="0" role="button">
+                    <h3>4. Making the Bike Yours</h3>
+                    <p>Customized workflows and purpose-built integrations</p>
+                </div>
+
+                <div class="stage-card" data-stage="5" tabindex="0" role="button">
+                    <h3>5. Riding Without Thinking</h3>
+                    <p>AI is the default operating model</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="stage-detail-section" class="hidden">
+            <button id="back-to-framework" class="back-button">← Back to Framework</button>
+            <div id="stage-detail-content">
+                <!-- Stage details will be dynamically loaded here -->
+            </div>
+            <div id="stage-navigation" class="stage-nav">
+                <!-- Stage navigation will be added here -->
+            </div>
+        </section>
+
+        <section id="all-stages-section" class="hidden">
+            <button id="back-to-start-from-stages" class="back-button">← Back to Home</button>
+            <h2>AI Transformation Journey = Learning to Ride the "AI" Bike</h2>
+
+            <p class="overview-description">Diagnosed by muscle memory: how much do we have to think about balance? Progress is wobbling less, thinking less, trusting more. Click each stage to learn more about what it looks like in practice.</p>
+            <div id="all-stages-content">
+                <!-- All stages overview will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <section id="results-section" class="hidden">
+            <h2>Assessment Results</h2>
+            <div id="results-content">
+                <!-- Results will be displayed here -->
+            </div>
+            <div class="actions">
+                <button id="view-stages">Learn more about the stages</button>
+                <button id="retake-assessment">Retake Assessment</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <nav class="footer-nav">
+            <a href="dashboard.html">View AX&E Dashboard</a>
+            <a href="#" onclick="showAllStages(); return false;">See Stage Snapshot</a>
+        </nav>
+    </footer>
+
+    <script src="assessment.js"></script>
+</body>
+</html>

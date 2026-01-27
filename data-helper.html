@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assessment Data Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        button { margin: 0.5rem; padding: 0.5rem 1rem; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Assessment Data Helper</h1>
+    <p>Use this tool to check and manage your assessment data.</p>
+    
+    <div>
+        <button onclick="viewCurrentData()">📊 View Current Data</button>
+        <button onclick="addSampleData()">➕ Add Sample Data</button>
+        <button onclick="clearAllData()">🗑️ Clear All Data</button>
+    </div>
+    
+    <hr>
+    
+    <div id="result"></div>
+    
+    <hr>
+    
+    <h2>🚀 Quick Access Links</h2>
+    <ul>
+        <li><a href="index.html" target="_blank">🏠 Home Page</a></li>
+        <li><a href="dashboard.html" target="_blank">📈 AX&E Dashboard</a></li>
+        <li><a href="admin/" target="_blank">👨‍💼 Admin Panel</a></li>
+    </ul>
+
+    <script>
+        function viewCurrentData() {
+            const data = localStorage.getItem('axe-ai-assessments');
+            const assessments = data ? JSON.parse(data) : [];
+            const count = assessments.length;
+            
+            let html = `<h3>Assessment Records Found: ${count}</h3>`;
+            
+            if (count === 0) {
+                html += '<p class="error">❌ No assessment data found in browser storage.</p>';
+                html += '<p>Either:</p><ul>';
+                html += '<li>No assessments have been completed yet</li>';
+                html += '<li>Data was cleared from browser storage</li>';
+                html += '<li>You\'re on a different browser/device than where assessments were completed</li>';
+                html += '</ul>';
+                html += '<p><strong>Solution:</strong> Click "Add Sample Data" to create test records.</p>';
+            } else {
+                html += '<table>';
+                html += '<tr><th>Manager Name</th><th>Team</th><th>Stage Result</th><th>Date</th><th>Session ID</th></tr>';
+                
+                assessments.forEach(assessment => {
+                    const date = new Date(assessment.timestamp).toLocaleDateString();
+                    const time = new Date(assessment.timestamp).toLocaleTimeString();
+                    html += `<tr>
+                        <td>${assessment.managerName || 'Unknown'}</td>
+                        <td>${assessment.axeTeam || 'Unknown'}</td>
+                        <td>Stage ${assessment.assessedStage || 'Unknown'}</td>
+                        <td>${date} ${time}</td>
+                        <td style="font-family: monospace; font-size: 0.8em;">${assessment.sessionId || 'Unknown'}</td>
+                    </tr>`;
+                });
+                
+                html += '</table>';
+                html += '<p class="success">✅ Data found! You can now access the admin panel.</p>';
+            }
+            
+            document.getElementById('result').innerHTML = html;
+        }
+        
+        function addSampleData() {
+            const sampleAssessments = [
+                {
+                    sessionId: 'demo-' + Date.now() + '-1',
+                    timestamp: new Date(Date.now() - 1000*60*60*24*1).toISOString(),
+                    managerName: 'Alice Johnson',
+                    axeTeam: 'DevRel',
+                    scores: [4, 4, 3, 4, 4],
+                    assessedStage: 4,
+                    suggestedStage: 4
+                },
+                {
+                    sessionId: 'demo-' + Date.now() + '-2',
+                    timestamp: new Date(Date.now() - 1000*60*60*24*2).toISOString(),
+                    managerName: 'Bob Smith',
+                    axeTeam: 'Product',
+                    scores: [3, 3, 3, 3, 3],
+                    assessedStage: 3,
+                    suggestedStage: 3
+                },
+                {
+                    sessionId: 'demo-' + Date.now() + '-3',
+                    timestamp: new Date(Date.now() - 1000*60*60*24*3).toISOString(),
+                    managerName: 'Carol Davis',
+                    axeTeam: 'CXS',
+                    scores: [5, 5, 5, 4, 5],
+                    assessedStage: 5,
+                    suggestedStage: 5
+                },
+                {
+                    sessionId: 'demo-' + Date.now() + '-4',
+                    timestamp: new Date(Date.now() - 1000*60*60*24*4).toISOString(),
+                    managerName: 'David Wilson',
+                    axeTeam: 'Learn',
+                    scores: [2, 2, 3, 2, 2],
+                    assessedStage: 2,
+                    suggestedStage: 2
+                }
+            ];
+            
+            localStorage.setItem('axe-ai-assessments', JSON.stringify(sampleAssessments));
+            document.getElementById('result').innerHTML = '<p class="success">✅ Sample assessment data created! 4 records added.</p><p>Now try viewing the admin panel.</p>';
+        }
+        
+        function clearAllData() {
+            localStorage.removeItem('axe-ai-assessments');
+            document.getElementById('result').innerHTML = '<p class="error">🗑️ All assessment data cleared from browser storage.</p>';
+        }
+        
+        // Auto-run on page load
+        window.onload = function() {
+            viewCurrentData();
+        };
+    </script>
+</body>
+</html>

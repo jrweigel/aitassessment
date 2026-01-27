@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Admin Data</title>
+</head>
+<body>
+    <h1>Assessment Data Manager</h1>
+    <div style="margin: 1rem 0;">
+        <button onclick="addTestData()">Add Test Assessment Data</button>
+        <button onclick="clearData()">Clear All Data</button>
+        <button onclick="viewData()">View Current Data</button>
+        <button onclick="checkAdminPanel()">Check Admin Panel Status</button>
+    </div>
+    <div id="output"></div>
+
+    <script>
+        function addTestData() {
+            const testData = [
+                {
+                    sessionId: 'test-1',
+                    timestamp: '2026-01-25T10:00:00.000Z',
+                    managerName: 'John Smith',
+                    axeTeam: 'DevRel',
+                    scores: [3, 4, 3, 4, 3],
+                    assessedStage: 3,
+                    suggestedStage: 3
+                },
+                {
+                    sessionId: 'test-2',
+                    timestamp: '2026-01-24T14:30:00.000Z',
+                    managerName: 'Sarah Johnson',
+                    axeTeam: 'Product',
+                    scores: [4, 4, 5, 4, 5],
+                    assessedStage: 4,
+                    suggestedStage: 4
+                },
+                {
+                    sessionId: 'test-3',
+                    timestamp: '2026-01-23T09:15:00.000Z',
+                    managerName: 'Mike Chen',
+                    axeTeam: 'CXS',
+                    scores: [2, 3, 2, 3, 2],
+                    assessedStage: 2,
+                    suggestedStage: 3
+                },
+                {
+                    sessionId: 'test-4',
+                    timestamp: '2026-01-22T16:45:00.000Z',
+                    managerName: 'Lisa Wong',
+                    axeTeam: 'Learn',
+                    scores: [5, 5, 4, 5, 5],
+                    assessedStage: 5,
+                    suggestedStage: 5
+                }
+            ];
+
+            localStorage.setItem('axe-ai-assessments', JSON.stringify(testData));
+            document.getElementById('output').innerHTML = '<p style="color: green;">✅ Test data added! 4 assessments created.</p>';
+        }
+
+        function clearData() {
+            localStorage.removeItem('axe-ai-assessments');
+            document.getElementById('output').innerHTML = '<p style="color: red;">❌ All assessment data cleared!</p>';
+        }
+
+        function viewData() {
+            const data = localStorage.getItem('axe-ai-assessments');
+            const parsed = data ? JSON.parse(data) : [];
+            const count = parsed.length;
+            
+            let html = `<h3>Found ${count} Assessment Records:</h3>`;
+            if (count > 0) {
+                html += '<table border="1" style="border-collapse: collapse; width: 100%; margin: 1rem 0;">';
+                html += '<tr><th>Manager</th><th>Team</th><th>Stage</th><th>Date</th></tr>';
+                parsed.forEach(assessment => {
+                    const date = new Date(assessment.timestamp).toLocaleDateString();
+                    html += `<tr>
+                        <td>${assessment.managerName}</td>
+                        <td>${assessment.axeTeam}</td>
+                        <td>${assessment.assessedStage}</td>
+                        <td>${date}</td>
+                    </tr>`;
+                });
+                html += '</table>';
+            } else {
+                html += '<p>No assessment records found in localStorage.</p>';
+            }
+            
+            document.getElementById('output').innerHTML = html;
+        }
+
+        function checkAdminPanel() {
+            const hasData = localStorage.getItem('axe-ai-assessments');
+            const count = hasData ? JSON.parse(hasData).length : 0;
+            
+            let html = `<div style="background: #f0f8ff; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <h3>📊 Admin Panel Access Instructions:</h3>
+                <p><strong>Current Assessment Count:</strong> ${count} records</p>
+                <ol>
+                    <li>Go to the <a href="dashboard.html" target="_blank">AX&E Dashboard</a></li>
+                    <li>Scroll to the bottom of the dashboard page</li>
+                    <li>Click the "Admin View (Internal Use Only)" link</li>
+                    <li>You should see the assessment record log with manager names</li>
+                </ol>
+                <p><strong>Direct link:</strong> <a href="admin/" target="_blank">Admin Panel</a></p>
+                ${count === 0 ? '<p style="color: red;">⚠️ No data found - click "Add Test Assessment Data" first!</p>' : ''}
+            </div>`;
+            
+            document.getElementById('output').innerHTML = html;
+        }
+
+        // Auto-check status on load
+        window.onload = function() {
+            checkAdminPanel();
+        };
+    </script>
+</body>
+</html>
