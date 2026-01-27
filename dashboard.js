@@ -25,29 +25,60 @@ class TransformationDashboard {
         this.bindEvents();
     }
 
-    loadData() {
-        // Load assessment data from localStorage
-        const storedData = localStorage.getItem('axe-ai-assessments');
-        const allData = storedData ? JSON.parse(storedData) : [];
-        
-        // Filter for last 90 days
-        const ninetyDaysAgo = new Date();
-        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-        
-        const recentData = allData.filter(assessment => {
-            return new Date(assessment.timestamp) >= ninetyDaysAgo;
-        });
-        
-        // Keep only latest assessment per team
-        const latestByTeam = {};
-        recentData.forEach(assessment => {
-            const key = `${assessment.axeTeam}_${assessment.managerName}`;
-            if (!latestByTeam[key] || new Date(assessment.timestamp) > new Date(latestByTeam[key].timestamp)) {
-                latestByTeam[key] = assessment;
-            }
-        });
-        
-        this.assessmentData = Object.values(latestByTeam);
+    async loadData() {
+        try {
+            // Try to load data from Azure API
+            const allData = await window.assessmentDataService.getAssessments({ admin: false });
+            console.log('Loaded', allData.length, 'assessments from Azure');
+            
+            // Filter for last 90 days
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+            
+            const recentData = allData.filter(assessment => {
+                return new Date(assessment.timestamp) >= ninetyDaysAgo;
+            });
+            
+            // Keep only latest assessment per team
+            const latestByTeam = {};
+            recentData.forEach(assessment => {
+                const key = `${assessment.axeTeam}_${assessment.managerName || 'unknown'}`;
+                if (!latestByTeam[key] || new Date(assessment.timestamp) > new Date(latestByTeam[key].timestamp)) {
+                    latestByTeam[key] = assessment;
+                }
+            });
+            
+            this.assessmentData = Object.values(latestByTeam);
+            
+        } catch (error) {
+            console.error('Failed to load data from Azure, falling back to localStorage:', error);
+            
+            // Fallback to localStorage
+            const storedData = localStorage.getItem('axe-ai-assessments');
+            const allData = storedData ? JSON.parse(storedData) : [];
+            
+            // Filter for last 90 days
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+            
+            const recentData = allData.filter(assessment => {
+                return new Date(assessment.timestamp) >= ninetyDaysAgo;
+            });
+            
+            // Keep only latest assessment per team
+            const latestByTeam = {};
+            recentData.forEach(assessment => {
+                const key = `${assessment.axeTeam}_${assessment.managerName}`;
+                if (!latestByTeam[key] || new Date(assessment.timestamp) > new Date(latestByTeam[key].timestamp)) {
+                    latestByTeam[key] = assessment;
+                }
+            });
+            
+            this.assessmentData = Object.values(latestByTeam);
+            
+            // Show notification that we're using offline data
+            this.showOfflineNotification();
+        }
         
         // If no data, show empty state
         if (this.assessmentData.length === 0) {
@@ -325,6 +356,37 @@ class TransformationDashboard {
             refreshBtn.textContent = originalText;
             refreshBtn.disabled = false;
         }, 2000);
+    }
+
+    showOfflineNotification() {
+        // Create notification element if it doesn't exist
+        let notification = document.getElementById('offline-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'offline-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #f97316;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                z-index: 10000;
+                max-width: 300px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            `;
+            document.body.appendChild(notification);
+        }
+        
+        notification.textContent = 'Using offline data. Some assessments may not be visible.';
+        notification.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
     }
 
     showEmptyState() {

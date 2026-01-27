@@ -18,20 +18,40 @@ class AdminDashboard {
         this.bindEvents();
     }
 
-    loadData() {
-        const storedData = localStorage.getItem('axe-ai-assessments');
-        const allData = storedData ? JSON.parse(storedData) : [];
-        
-        // Filter for last 90 days for admin persistence
-        const ninetyDaysAgo = new Date();
-        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-        
-        // Show all assessments from last 90 days for admin log
-        this.assessmentData = allData.filter(assessment => {
-            return new Date(assessment.timestamp) >= ninetyDaysAgo;
-        });
-        
-        console.log('Admin loadData:', this.assessmentData.length, 'assessments found (last 90 days)');
+    async loadData() {
+        try {
+            // Try to load data from Azure API with admin access
+            const allData = await window.assessmentDataService.getAssessments({ admin: true });
+            console.log('Admin loadData:', allData.length, 'assessments found from Azure');
+            
+            // Filter for last 90 days for admin persistence
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+            
+            // Show all assessments from last 90 days for admin log
+            this.assessmentData = allData.filter(assessment => {
+                return new Date(assessment.timestamp) >= ninetyDaysAgo;
+            });
+            
+        } catch (error) {
+            console.error('Failed to load admin data from Azure, falling back to localStorage:', error);
+            
+            // Fallback to localStorage
+            const storedData = localStorage.getItem('axe-ai-assessments');
+            const allData = storedData ? JSON.parse(storedData) : [];
+            
+            // Filter for last 90 days for admin persistence
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+            
+            // Show all assessments from last 90 days for admin log
+            this.assessmentData = allData.filter(assessment => {
+                return new Date(assessment.timestamp) >= ninetyDaysAgo;
+            });
+            
+            // Show notification that we're using offline data
+            this.showOfflineNotification();
+        }
         
         // Sort by timestamp descending (newest first) for record log
         this.assessmentData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -115,13 +135,26 @@ class AdminDashboard {
         });
     }
 
-    deleteRecord(timestamp) {
+    async deleteRecord(timestamp) {
+        const assessment = this.assessmentData.find(a => a.timestamp === timestamp);
+        if (!assessment) return;
+        
         if (confirm('Are you sure you want to delete this assessment record?')) {
+            try {
+                // Try to delete from Azure first
+                await window.assessmentDataService.deleteAssessment(assessment.sessionId, assessment.axeTeam);
+                console.log('Assessment deleted from Azure successfully');
+                
+            } catch (error) {
+                console.error('Failed to delete from Azure:', error);
+                // Continue with local deletion anyway
+            }
+            
             // Remove from current filtered data
             this.assessmentData = this.assessmentData.filter(a => a.timestamp !== timestamp);
             this.filteredData = this.filteredData.filter(a => a.timestamp !== timestamp);
             
-            // Remove from full localStorage dataset
+            // Remove from localStorage as backup
             const storedData = localStorage.getItem('axe-ai-assessments');
             const allData = storedData ? JSON.parse(storedData) : [];
             const updatedAllData = allData.filter(a => a.timestamp !== timestamp);
@@ -384,6 +417,37 @@ class AdminDashboard {
     refreshData() {
         this.loadData();
         this.renderAdminDashboard();
+    }
+
+    showOfflineNotification() {
+        // Create notification element if it doesn't exist
+        let notification = document.getElementById('offline-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'offline-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #f97316;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                z-index: 10000;
+                max-width: 300px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            `;
+            document.body.appendChild(notification);
+        }
+        
+        notification.textContent = 'Using offline data. Full admin features may not be available.';
+        notification.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
     }
 
     viewDetails(sessionId) {

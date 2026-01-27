@@ -909,6 +909,37 @@ class AITransformationAssessment {
         this.showFinalConfirmation(finalResult);
     }
 
+    showSaveNotification(message) {
+        // Create notification element if it doesn't exist
+        let notification = document.getElementById('save-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'save-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #f97316;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                z-index: 10000;
+                max-width: 300px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            `;
+            document.body.appendChild(notification);
+        }
+        
+        notification.textContent = message;
+        notification.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
+    }
+
     showFinalConfirmation(result) {
         const stageColors = ['', '#6b7280', '#f97316', '#eab308', '#2563eb', '#16a34a'];
         const stageNames = ['', 'Unboxing & Assembling', 'Riding with Training Wheels', 'Training Wheels Off', 'Making the Bike Yours', 'Riding Without Thinking'];
@@ -933,26 +964,35 @@ class AITransformationAssessment {
         document.getElementById('results-content').innerHTML = confirmationHtml;
     }
 
-    saveAssessmentResult(result) {
-        // Save to localStorage for persistence
-        const existingData = JSON.parse(localStorage.getItem('axe-ai-assessments') || '[]');
-        
-        // If this is an update (has sessionId), replace the existing entry
-        if (result.sessionId) {
-            const existingIndex = existingData.findIndex(item => item.sessionId === result.sessionId);
-            if (existingIndex >= 0) {
-                existingData[existingIndex] = result;
+    async saveAssessmentResult(result) {
+        try {
+            // Try to save to Azure first
+            await window.assessmentDataService.submitAssessment(result);
+            console.log('Assessment saved to Azure successfully');
+            
+            // Also save to localStorage as backup
+            const existingData = JSON.parse(localStorage.getItem('axe-ai-assessments') || '[]');
+            
+            // If this is an update (has sessionId), replace the existing entry
+            if (result.sessionId) {
+                const existingIndex = existingData.findIndex(item => item.sessionId === result.sessionId);
+                if (existingIndex >= 0) {
+                    existingData[existingIndex] = result;
+                } else {
+                    existingData.push(result);
+                }
             } else {
                 existingData.push(result);
             }
-        } else {
-            existingData.push(result);
+            
+            localStorage.setItem('axe-ai-assessments', JSON.stringify(existingData));
+            localStorage.setItem('axe-ai-latest-result', JSON.stringify(result));
+            
+        } catch (error) {
+            console.error('Failed to save to Azure, data saved locally only:', error);
+            // Show user notification that data is saved locally
+            this.showSaveNotification('Assessment saved locally. Data will sync when connection is restored.');
         }
-        
-        localStorage.setItem('axe-ai-assessments', JSON.stringify(existingData));
-        
-        // Save current result for easy access
-        localStorage.setItem('axe-ai-latest-result', JSON.stringify(result));
     }
 
     loadSavedData() {
