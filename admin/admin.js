@@ -1,6 +1,8 @@
 // AX&E AI Transformation Admin Dashboard
 // Internal view with manager names and detailed analytics
 
+console.log('Admin.js loaded successfully');
+
 class AdminDashboard {
     constructor() {
         this.assessmentData = [];
