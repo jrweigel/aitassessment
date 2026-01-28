@@ -50,8 +50,16 @@ module.exports = async function (context, req) {
             return;
         }
 
-        // Create table client
+        // Create table client and ensure table exists
         const tableClient = new TableClient(connectionString, 'aitassessments');
+        
+        try {
+            await tableClient.createTable();
+            context.log('Table created or already exists');
+        } catch (tableError) {
+            // Table might already exist, which is fine
+            context.log('Table creation result:', tableError.message);
+        }
 
         // Delete the entity
         await tableClient.deleteEntity(partitionKey, sessionId);

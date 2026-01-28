@@ -46,8 +46,16 @@ module.exports = async function (context, req) {
         const adminView = url.searchParams.get('admin') === 'true';
         const sessionId = url.searchParams.get('sessionId');
 
-        // Create table client
+        // Create table client and ensure table exists
         const tableClient = new TableClient(connectionString, 'aitassessments');
+        
+        try {
+            await tableClient.createTable();
+            context.log('Table created or already exists');
+        } catch (tableError) {
+            // Table might already exist, which is fine
+            context.log('Table creation result:', tableError.message);
+        }
 
         let assessments = [];
 
