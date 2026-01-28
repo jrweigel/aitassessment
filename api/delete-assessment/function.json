@@ -8,8 +8,7 @@
       "methods": [
         "delete",
         "options"
-      ],
-      "route": "delete-assessment"
+      ]
     },
     {
       "type": "http",

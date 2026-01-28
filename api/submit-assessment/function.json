@@ -5,8 +5,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["post", "options"],
-      "route": "submit-assessment"
+      "methods": ["post", "options"]
     },
     {
       "type": "http",

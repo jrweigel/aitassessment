@@ -8,8 +8,7 @@
       "methods": [
         "get",
         "options"
-      ],
-      "route": "get-assessments"
+      ]
     },
     {
       "type": "http",
