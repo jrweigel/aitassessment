@@ -1,126 +1,106 @@
-const { app } = require('@azure/functions');
 const { TableClient } = require('@azure/data-tables');
 
-app.http('get-assessments', {
-    methods: ['GET', 'OPTIONS'],
-    authLevel: 'anonymous',
-    route: 'get-assessments',
-    handler: async (request, context) => {
-        context.log(`Http function processed request for url "${request.url}"`);
+module.exports = async function (context, req) {
+    context.log(`Get assessments function started for URL: ${req.url}`);
 
-        // Handle CORS preflight
-        if (request.method === 'OPTIONS') {
-            return {
-                status: 200,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                }
-            };
+    // Set CORS headers
+    context.res = {
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Content-Type': 'application/json'
         }
+    };
 
-        // Only allow GET
-        if (request.method !== 'GET') {
-            return {
-                status: 405,
-                headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ error: 'Method not allowed. Use GET.' })
-            };
-        }
-
-        try {
-            const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-            if (!connectionString) {
-                context.log('Azure Storage connection string not configured');
-                return {
-                    status: 503,
-                    headers: { 
-                        'Access-Control-Allow-Origin': '*',
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify({ 
-                        error: 'Storage not configured. Using local data only.',
-                        code: 'STORAGE_NOT_CONFIGURED',
-                        assessments: [],
-                        count: 0
-                    })
-                };
-            }
-
-            // Parse query parameters
-            const url = new URL(request.url);
-            const adminView = url.searchParams.get('admin') === 'true';
-            const sessionId = url.searchParams.get('sessionId');
-
-            // Create table client
-            const tableClient = new TableClient(connectionString, 'aitassessments');
-
-            let assessments = [];
-
-            if (sessionId) {
-                // Get specific assessment by sessionId
-                const entities = tableClient.listEntities({
-                    filter: `rowKey eq '${sessionId}'`
-                });
-                
-                for await (const entity of entities) {
-                    assessments.push(transformEntity(entity));
-                }
-            } else {
-                // Get all assessments with 90-day filter
-                const ninetyDaysAgo = new Date();
-                ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-                const filterDate = ninetyDaysAgo.toISOString();
-
-                const entities = tableClient.listEntities({
-                    filter: `timestamp ge datetime'${filterDate}'`
-                });
-                
-                for await (const entity of entities) {
-                    const transformedEntity = transformEntity(entity);
-                    
-                    // For non-admin view, only return anonymized data
-                    if (!adminView) {
-                        delete transformedEntity.managerName;
-                    }
-                    
-                    assessments.push(transformedEntity);
-                }
-            }
-
-            context.log(`Retrieved ${assessments.length} assessments`);
-
-            return {
-                status: 200,
-                headers: { 
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    success: true,
-                    assessments: assessments,
-                    count: assessments.length
-                })
-            };
-
-        } catch (error) {
-            context.log('Error in get-assessments:', error);
-            return {
-                status: 500,
-                headers: { 
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify({ 
-                    success: false, 
-                    error: 'Failed to retrieve assessment data',
-                    details: error.message
-                })
-            };
-        }
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+        context.res.status = 200;
+        context.res.body = '';
+        return;
     }
-});
+
+    // Only allow GET
+    if (req.method !== 'GET') {
+        context.res.status = 405;
+        context.res.body = JSON.stringify({ error: 'Method not allowed. Use GET.' });
+        return;
+    }
+
+    try {
+        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        if (!connectionString) {
+            context.log('Azure Storage connection string not configured');
+            context.res.status = 503;
+            context.res.body = JSON.stringify({ 
+                error: 'Storage not configured. Using local data only.',
+                code: 'STORAGE_NOT_CONFIGURED',
+                assessments: [],
+                count: 0
+            });
+            return;
+        }
+
+        // Parse query parameters
+        const url = new URL(`http://localhost${req.url}`);
+        const adminView = url.searchParams.get('admin') === 'true';
+        const sessionId = url.searchParams.get('sessionId');
+
+        // Create table client
+        const tableClient = new TableClient(connectionString, 'aitassessments');
+
+        let assessments = [];
+
+        if (sessionId) {
+            // Get specific assessment by sessionId
+            const entities = tableClient.listEntities({
+                filter: `rowKey eq '${sessionId}'`
+            });
+            
+            for await (const entity of entities) {
+                assessments.push(transformEntity(entity));
+            }
+        } else {
+            // Get all assessments with 90-day filter
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+            const filterDate = ninetyDaysAgo.toISOString();
+
+            const entities = tableClient.listEntities({
+                filter: `timestamp ge datetime'${filterDate}'`
+            });
+            
+            for await (const entity of entities) {
+                const transformedEntity = transformEntity(entity);
+                
+                // For non-admin view, only return anonymized data
+                if (!adminView) {
+                    delete transformedEntity.managerName;
+                }
+                
+                assessments.push(transformedEntity);
+            }
+        }
+
+        context.log(`Retrieved ${assessments.length} assessments`);
+
+        context.res.status = 200;
+        context.res.body = JSON.stringify({
+            success: true,
+            assessments: assessments,
+            count: assessments.length
+        });
+
+    } catch (error) {
+        context.log('Error in get-assessments:', error);
+        context.res.status = 500;
+        context.res.body = JSON.stringify({ 
+            success: false, 
+            error: 'Failed to retrieve assessment data',
+            details: error.message
+        });
+    }
+};
 
 function transformEntity(entity) {
     return {
