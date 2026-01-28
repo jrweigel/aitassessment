@@ -4,8 +4,9 @@ const { TableClient } = require('@azure/data-tables');
 app.http('submit-assessment', {
     methods: ['POST', 'OPTIONS'],
     authLevel: 'anonymous',
+    route: 'submit-assessment',
     handler: async (request, context) => {
-        context.log('Submit assessment function started');
+        context.log(`Http function processed request for url "${request.url}"`);
 
         // Handle CORS preflight
         if (request.method === 'OPTIONS') {
@@ -19,13 +20,25 @@ app.http('submit-assessment', {
             };
         }
 
+        // Only allow POST
+        if (request.method !== 'POST') {
+            return {
+                status: 405,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ error: 'Method not allowed. Use POST.' })
+            };
+        }
+
         try {
             const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
             if (!connectionString) {
                 context.log('Azure Storage connection string not configured');
                 return {
                     status: 503,
-                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json' 
+                    },
                     body: JSON.stringify({ 
                         error: 'Storage not configured. Data will be saved locally.',
                         code: 'STORAGE_NOT_CONFIGURED'
@@ -34,14 +47,32 @@ app.http('submit-assessment', {
             }
 
             // Parse request body
-            const assessmentData = await request.json();
-            context.log('Received assessment data:', assessmentData);
+            let assessmentData;
+            try {
+                const bodyText = await request.text();
+                context.log('Raw request body:', bodyText);
+                assessmentData = JSON.parse(bodyText);
+                context.log('Parsed assessment data:', assessmentData);
+            } catch (parseError) {
+                context.log('Error parsing request body:', parseError);
+                return {
+                    status: 400,
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({ error: 'Invalid JSON in request body' })
+                };
+            }
 
             // Validate required fields
             if (!assessmentData.managerName || !assessmentData.axeTeam || !assessmentData.sessionId) {
                 return {
                     status: 400,
-                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json' 
+                    },
                     body: JSON.stringify({ error: 'Missing required fields: managerName, axeTeam, sessionId' })
                 };
             }
@@ -90,7 +121,10 @@ app.http('submit-assessment', {
             context.log('Error in submit-assessment:', error);
             return {
                 status: 500,
-                headers: { 'Access-Control-Allow-Origin': '*' },
+                headers: { 
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json' 
+                },
                 body: JSON.stringify({ 
                     success: false, 
                     error: 'Failed to save assessment data',

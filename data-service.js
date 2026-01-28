@@ -30,8 +30,19 @@ class AssessmentDataService {
             console.log('API Response status:', response.status);
             console.log('API Response headers:', Object.fromEntries(response.headers.entries()));
 
-            const result = await response.json();
-            console.log('API Response body:', result);
+            // Check if response has content
+            const responseText = await response.text();
+            console.log('API Response text:', responseText);
+
+            let result;
+            try {
+                result = responseText ? JSON.parse(responseText) : {};
+            } catch (jsonError) {
+                console.error('Failed to parse JSON response:', jsonError);
+                result = { error: 'Invalid response from server', rawResponse: responseText };
+            }
+
+            console.log('API Response parsed:', result);
             
             if (!response.ok) {
                 throw new Error(result.error || `API returned ${response.status}: ${response.statusText}`);

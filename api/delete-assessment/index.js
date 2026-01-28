@@ -4,8 +4,9 @@ const { TableClient } = require('@azure/data-tables');
 app.http('delete-assessment', {
     methods: ['DELETE', 'OPTIONS'],
     authLevel: 'anonymous',
+    route: 'delete-assessment',
     handler: async (request, context) => {
-        context.log('Delete assessment function started');
+        context.log(`Http function processed request for url "${request.url}"`);
 
         // Handle CORS preflight
         if (request.method === 'OPTIONS') {
@@ -19,10 +20,28 @@ app.http('delete-assessment', {
             };
         }
 
+        // Only allow DELETE
+        if (request.method !== 'DELETE') {
+            return {
+                status: 405,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ error: 'Method not allowed. Use DELETE.' })
+            };
+        }
+
         try {
             const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
             if (!connectionString) {
-                throw new Error('Azure Storage connection string not configured');
+                return {
+                    status: 503,
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({ 
+                        error: 'Storage not configured'
+                    })
+                };
             }
 
             // Parse query parameters
@@ -33,7 +52,10 @@ app.http('delete-assessment', {
             if (!sessionId || !partitionKey) {
                 return {
                     status: 400,
-                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json' 
+                    },
                     body: JSON.stringify({ 
                         error: 'Missing required parameters: sessionId and partitionKey' 
                     })
@@ -64,7 +86,10 @@ app.http('delete-assessment', {
             context.log('Error in delete-assessment:', error);
             return {
                 status: 500,
-                headers: { 'Access-Control-Allow-Origin': '*' },
+                headers: { 
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json' 
+                },
                 body: JSON.stringify({ 
                     success: false, 
                     error: 'Failed to delete assessment',
