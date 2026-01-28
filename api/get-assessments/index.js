@@ -31,12 +31,11 @@ module.exports = async function (context, req) {
         // Debug logging for environment variables
         context.log('Available environment variables:', {
             hasAzureStorageConnection: !!process.env.AZURE_STORAGE_CONNECTION_STRING,
-            hasAzureWebJobsStorage: !!process.env.AzureWebJobsStorage,
             nodeEnv: process.env.NODE_ENV,
             functionName: context.executionContext?.functionName
         });
 
-        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING || process.env.AzureWebJobsStorage;
+        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
         if (!connectionString) {
             context.log('Azure Storage connection string not configured');
             context.res.status = 503;
