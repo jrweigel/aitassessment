@@ -8,9 +8,16 @@ class AssessmentDataService {
         this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:7071/api'  // Local Functions development
             : '/api';  // Production Azure Static Web Apps
+            
+        console.log('AssessmentDataService initialized with API base URL:', this.apiBaseUrl);
+        console.log('Current hostname:', window.location.hostname);
+        console.log('Full location:', window.location.href);
     }
 
     async submitAssessment(assessmentData) {
+        console.log('submitAssessment called with:', assessmentData);
+        console.log('API URL will be:', `${this.apiBaseUrl}/submit-assessment`);
+        
         try {
             const response = await fetch(`${this.apiBaseUrl}/submit-assessment`, {
                 method: 'POST',
@@ -20,16 +27,28 @@ class AssessmentDataService {
                 body: JSON.stringify(assessmentData)
             });
 
+            console.log('API Response status:', response.status);
+            console.log('API Response headers:', Object.fromEntries(response.headers.entries()));
+
             const result = await response.json();
+            console.log('API Response body:', result);
             
             if (!response.ok) {
-                throw new Error(result.error || 'Failed to submit assessment');
+                throw new Error(result.error || `API returned ${response.status}: ${response.statusText}`);
             }
 
+            console.log('Assessment submitted successfully to API');
             return result;
         } catch (error) {
-            console.error('Error submitting assessment:', error);
+            console.error('Error submitting assessment to API:', error);
+            console.error('Full error details:', {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            });
+            
             // Fallback to localStorage for offline scenarios
+            console.log('Falling back to localStorage');
             this.saveToLocalStorage(assessmentData);
             throw error;
         }
