@@ -19,12 +19,20 @@ module.exports = async function (context, req) {
             return;
         }
 
+        // Check environment variables
+        const hasStorageConnection = !!process.env.AZURE_STORAGE_CONNECTION_STRING;
+        
         // Simple health check without dependencies
         context.res.status = 200;
         context.res.body = JSON.stringify({
             status: 'healthy',
             timestamp: new Date().toISOString(),
-            message: 'Basic health check working'
+            environment: {
+                nodeVersion: process.version,
+                hasStorageConnection: hasStorageConnection,
+                platform: process.platform
+            },
+            message: 'Azure Functions working - Node.js 18'
         });
     } catch (error) {
         context.log.error('Health check error:', error);
