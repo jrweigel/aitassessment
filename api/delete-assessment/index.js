@@ -1,4 +1,5 @@
-const { TableClient } = require('@azure/data-tables');
+// Use direct Azure Tables REST API instead of SDK
+const crypto = require('crypto');
 
 module.exports = async function (context, req) {
     context.log(`Delete assessment function started for URL: ${req.url}`);
@@ -13,27 +14,20 @@ module.exports = async function (context, req) {
         }
     };
 
-    // Handle CORS preflight
-    if (req.method === 'OPTIONS') {
-        context.res.status = 200;
-        context.res.body = '';
-        return;
-    }
-
-    // Only allow DELETE
-    if (req.method !== 'DELETE') {
-        context.res.status = 405;
-        context.res.body = JSON.stringify({ error: 'Method not allowed. Use DELETE.' });
-        return;
-    }
-
     try {
-        // Debug logging for environment variables
-        context.log('Available environment variables:', {
-            hasAzureStorageConnection: !!process.env.AZURE_STORAGE_CONNECTION_STRING,
-            nodeEnv: process.env.NODE_ENV,
-            functionName: context.executionContext?.functionName
-        });
+        // Handle CORS preflight
+        if (req.method === 'OPTIONS') {
+            context.res.status = 200;
+            context.res.body = '';
+            return;
+        }
+
+        // Only allow DELETE
+        if (req.method !== 'DELETE') {
+            context.res.status = 405;
+            context.res.body = JSON.stringify({ error: 'Method not allowed. Use DELETE.' });
+            return;
+        }
 
         const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
         if (!connectionString) {
@@ -57,27 +51,35 @@ module.exports = async function (context, req) {
             return;
         }
 
-        // Create table client and ensure table exists
-        const tableClient = new TableClient(connectionString, 'aitassessments');
+        // Parse connection string
+        const connStringParts = {};
+        connectionString.split(';').forEach(part => {
+            const [key, value] = part.split('=', 2);
+            if (key && value) {
+                connStringParts[key] = value;
+            }
+        });
+
+        const accountName = connStringParts.AccountName;
+        const accountKey = connStringParts.AccountKey;
         
-        try {
-            await tableClient.createTable();
-            context.log('Table created or already exists');
-        } catch (tableError) {
-            // Table might already exist, which is fine
-            context.log('Table creation result:', tableError.message);
+        if (!accountName || !accountKey) {
+            throw new Error('Invalid connection string format');
         }
 
-        // Delete the entity
-        await tableClient.deleteEntity(partitionKey, sessionId);
-
-        context.log(`Deleted assessment: ${sessionId} from ${partitionKey}`);
-
-        context.res.status = 200;
-        context.res.body = JSON.stringify({
-            success: true,
-            message: 'Assessment deleted successfully'
-        });
+        // Delete from Azure Table using direct REST API
+        const result = await deleteFromAzureTable(accountName, accountKey, 'aitassessments', partitionKey, sessionId, context);
+        
+        if (result.success) {
+            context.log(`Deleted assessment: ${sessionId} from ${partitionKey}`);
+            context.res.status = 200;
+            context.res.body = JSON.stringify({
+                success: true,
+                message: 'Assessment deleted successfully'
+            });
+        } else {
+            throw new Error(result.error);
+        }
 
     } catch (error) {
         context.log('Error in delete-assessment:', error);
@@ -89,3 +91,43 @@ module.exports = async function (context, req) {
         });
     }
 };
+
+async function deleteFromAzureTable(accountName, accountKey, tableName, partitionKey, rowKey, context) {
+    try {
+        const url = `https://${accountName}.table.core.windows.net/${tableName}(PartitionKey='${partitionKey}',RowKey='${rowKey}')`;
+        const dateString = new Date().toUTCString();
+        
+        // Create authorization signature for DELETE
+        const stringToSign = `DELETE\n\n\n${dateString}\n/${accountName}/${tableName}(PartitionKey='${partitionKey}',RowKey='${rowKey}')`;
+        const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
+            .update(stringToSign)
+            .digest('base64');
+        
+        const authHeader = `SharedKey ${accountName}:${signature}`;
+        
+        context.log('Making delete request to Azure Tables:', url);
+        
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authHeader,
+                'x-ms-date': dateString,
+                'x-ms-version': '2020-04-08',
+                'If-Match': '*'
+            }
+        });
+
+        context.log('Azure Tables delete response status:', response.status);
+        
+        if (response.ok || response.status === 404) { // 404 = already deleted
+            return { success: true };
+        } else {
+            const errorText = await response.text();
+            return { success: false, error: `Azure Tables error: ${response.status} - ${errorText}` };
+        }
+
+    } catch (error) {
+        context.log.error('Error in deleteFromAzureTable:', error);
+        return { success: false, error: error.message };
+    }
+}
