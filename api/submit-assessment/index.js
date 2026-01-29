@@ -67,6 +67,17 @@ module.exports = async function (context, req) {
         // Create TableClient with connection string
         const client = TableClient.fromConnectionString(connectionString, 'aitassessments');
         
+        // Ensure table exists (create if needed)
+        try {
+            await client.createTable();
+            context.log('Table created or already exists');
+        } catch (tableError) {
+            // Table might already exist, which is fine
+            if (tableError.statusCode !== 409) {
+                context.log('Table creation error:', tableError);
+            }
+        }
+        
         // Prepare entity for Azure Table Storage
         const entity = {
             partitionKey: assessmentData.axeTeam,
