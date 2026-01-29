@@ -1,0 +1,29 @@
+# Ignore all local settings
+*.local.json
+local.settings.json
+
+# Logs
+*.log
+
+# Node modules
+node_modules/
+
+# Editor directories and files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Dependencies
+*~
+
+# Environments
+.env
+.env.local
+.env.*.local
+
+# Azure Core Tools
+.vscode/
+bin/
+obj/
