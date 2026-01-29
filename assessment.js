@@ -567,7 +567,37 @@ class AITransformationAssessment {
         const stages = {
             1: {
                 title: "Stage 1: Unboxing & Assembling the Bike",
+                subtitle: "foundations",
                 description: "At this stage, people are getting access to AI tools and learning the basics. Nothing is automatic yet.",
+                whatItLooks: [
+                    "Team members are getting access to basic AI tools (ChatGPT, Copilot, etc.)",
+                    "People are learning through experimentation and trial-and-error",
+                    "Significant manual setup is required for most AI tasks",
+                    "Results require heavy human review and validation",
+                    "Usage is inconsistent across the team"
+                ],
+                peopleAreSaying: [
+                    "\"I'm still figuring out how to write good prompts\"",
+                    "\"Do we have access to [AI tool] yet?\"",
+                    "\"I tried AI for this but it didn't work great\"",
+                    "\"Can someone show me how to use this properly?\"",
+                    "\"I don't trust this output - let me double-check everything\""
+                ],
+                notPastThisStage: [
+                    "Team members still asking basic \"how to\" questions about AI tools",
+                    "Significant time spent on tool setup and configuration",
+                    "Inconsistent adoption across the team",
+                    "Heavy reliance on manual review of all AI outputs",
+                    "No established patterns or templates for AI usage"
+                ],
+                whatToFocus: [
+                    "Ensure everyone has access to essential AI tools",
+                    "Provide basic training on prompt engineering and best practices",
+                    "Share successful use cases and templates within the team",
+                    "Establish guidelines for appropriate AI tool usage",
+                    "Build confidence through hands-on experimentation"
+                ],
+                whyThisMatters: "This foundation stage is critical for building team confidence and establishing good habits. Don't rush through it - solid basics enable faster progress in later stages.",
                 questions: [
                     {
                         text: "How often does your team currently use AI tools in their daily work?",
@@ -590,8 +620,38 @@ class AITransformationAssessment {
                 ]
             },
             2: {
-                title: "Stage 2: Riding with Training Wheels", 
+                title: "Stage 2: Riding with Training Wheels",
+                subtitle: "guided exploration", 
                 description: "AI is used regularly, but with guardrails. People know what's allowed and double-check results.",
+                whatItLooks: [
+                    "Regular AI usage with established review processes",
+                    "Clear policies and guidelines for AI tool usage",
+                    "Team has developed prompt templates and best practices",
+                    "Human oversight is standard but not burdensome",
+                    "Confidence is building but validation is still important"
+                ],
+                peopleAreSaying: [
+                    "\"Let me run this by you before we use it\"",
+                    "\"We should review this AI output together\"", 
+                    "\"I'm getting more comfortable with this tool\"",
+                    "\"Here's the template I use for these prompts\"",
+                    "\"This fits our guidelines, so we're good to go\""
+                ],
+                notPastThisStage: [
+                    "Still requiring approval for most AI-generated content",
+                    "Spending significant time on validation and review",
+                    "Hesitation to use AI for important or visible work",
+                    "Limited customization of AI tools for team needs",
+                    "Relying heavily on external guidance and best practices"
+                ],
+                whatToFocus: [
+                    "Develop team-specific AI usage guidelines and standards",
+                    "Create templates and workflows that reduce setup time",
+                    "Build confidence through successful AI-assisted projects",
+                    "Establish efficient review processes that add value",
+                    "Share examples of appropriate AI usage within your domain"
+                ],
+                whyThisMatters: "This stage builds systematic confidence and establishes healthy habits. The guardrails here prevent costly mistakes while the team develops judgment and expertise.",
                 questions: [
                     {
                         text: "How does your team handle AI-generated content or decisions?",
@@ -615,7 +675,37 @@ class AITransformationAssessment {
             },
             3: {
                 title: "Stage 3: Training Wheels Off",
+                subtitle: "independent operation",
                 description: "Teams can operate independently but still think about balance. Workflows are changing and AI handles real work.",
+                whatItLooks: [
+                    "AI is trusted for important work with periodic check-ins",
+                    "Workflows have been redesigned to incorporate AI capabilities", 
+                    "Team operates independently but still considers best practices",
+                    "AI handles real responsibilities, not just experimentation",
+                    "Balance between AI efficiency and human judgment"
+                ],
+                peopleAreSaying: [
+                    "\"AI can handle this, but let me review the output\"",
+                    "\"We've changed how we approach this type of work\"",
+                    "\"I trust AI for this task based on past performance\"",
+                    "\"Our process is much more efficient now\"",
+                    "\"I'm still learning when to use AI vs when to do it myself\""
+                ],
+                notPastThisStage: [
+                    "Still hesitant to let AI handle critical work",
+                    "Workflows haven't significantly changed to leverage AI",
+                    "Constant second-guessing of AI recommendations",
+                    "Manual processes still dominate over AI-enhanced ones",
+                    "Team still thinks about AI as an add-on rather than integrated tool"
+                ],
+                whatToFocus: [
+                    "Redesign key workflows to take advantage of AI capabilities",
+                    "Build trust through successful AI-handled projects",
+                    "Develop team expertise in knowing when and how to use AI",
+                    "Create feedback loops to improve AI integration",
+                    "Share success stories and lessons learned"
+                ],
+                whyThisMatters: "This is the key transformation moment where AI becomes integral to how work gets done. Teams that successfully navigate this stage see significant productivity and quality improvements.",
                 questions: [
                     {
                         text: "How have your team's workflows and processes changed due to AI adoption?",
@@ -639,7 +729,37 @@ class AITransformationAssessment {
             },
             4: {
                 title: "Stage 4: Making the Bike Yours",
+                subtitle: "customization & optimization",
                 description: "The team customizes AI tools for their specific needs. Purpose-built solutions and integrations are in place.",
+                whatItLooks: [
+                    "Custom AI solutions built for team-specific needs",
+                    "Integration of AI capabilities into existing tools and systems",
+                    "Team actively evaluates and implements new AI capabilities",
+                    "Sophisticated prompt engineering and fine-tuning",
+                    "AI solutions are maintained and iteratively improved"
+                ],
+                peopleAreSaying: [
+                    "\"We built a custom solution that integrates with our workflow\"",
+                    "\"This AI model works better when we configure it like this\"",
+                    "\"Let's evaluate this new AI capability for our use case\"",
+                    "\"We've automated this entire process with AI\"",
+                    "\"Our AI setup is specifically designed for how we work\""
+                ],
+                notPastThisStage: [
+                    "Relying only on standard, out-of-the-box AI tools",
+                    "Waiting for others to build integrations rather than creating them",
+                    "Manual configuration required each time AI tools are used",
+                    "No custom prompts, models, or AI workflows developed",
+                    "AI tools feel disconnected from your main work systems"
+                ],
+                whatToFocus: [
+                    "Identify opportunities for custom AI solutions and integrations",
+                    "Build team capabilities in AI tool configuration and optimization",
+                    "Develop APIs and workflows that connect AI with your existing systems",
+                    "Create reusable templates and solutions for common team needs",
+                    "Establish processes for evaluating and implementing new AI capabilities"
+                ],
+                whyThisMatters: "Customization is where AI truly becomes a competitive advantage. Teams that build purpose-built solutions see order-of-magnitude improvements rather than incremental gains.",
                 questions: [
                     {
                         text: "How customized are your AI tools and workflows for your team's specific needs?",
@@ -663,7 +783,30 @@ class AITransformationAssessment {
             },
             5: {
                 title: "Stage 5: Riding Without Thinking",
+                subtitle: "unconscious competence",
                 description: "AI becomes the default operating model. People use AI automatically without thinking about how to pedal.",
+                whatItLooks: [
+                    "AI usage is seamless and automatic in daily operations",
+                    "Team defaults to AI-enhanced approaches without conscious thought",
+                    "AI is invisible infrastructure that just works",
+                    "Continuous optimization happens in the background",
+                    "AI augments human thinking rather than replacing it"
+                ],
+                peopleAreSaying: [
+                    "\"I don't really think about whether to use AI - it's just how we work\"",
+                    "\"AI helps me think better and work more effectively\"",
+                    "\"Our systems automatically handle most of the AI complexity\"",
+                    "\"I can focus on the creative/strategic work while AI handles the routine\"",
+                    "\"This is just how work gets done now\""
+                ],
+                notPastThisStage: [
+                    "Still consciously deciding when and how to use AI",
+                    "AI feels like an additional tool rather than integrated capability",
+                    "Mental overhead required to coordinate AI usage",
+                    "Disruption to normal thinking patterns when using AI",
+                    "AI usage requires planning and conscious effort"
+                ],
+                whyThisMatters: "This stage represents AI fluency - the technology disappears and becomes invisible infrastructure that amplifies human capability. It's the difference between using AI and becoming AI-enhanced.",
                 questions: [
                     {
                         text: "How automatic is AI usage in your team's daily operations?",
