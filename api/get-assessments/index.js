@@ -1,5 +1,7 @@
 // Use direct Azure Tables REST API instead of SDK
 const crypto = require('crypto');
+const https = require('https');
+const { URL } = require('url');
 
 module.exports = async function (context, req) {
     context.log(`Get assessments function started for URL: ${req.url}`);
@@ -46,9 +48,9 @@ module.exports = async function (context, req) {
         }
 
         // Parse query parameters
-        const url = new URL(`http://localhost${req.url}`);
-        const adminView = url.searchParams.get('admin') === 'true';
-        const sessionId = url.searchParams.get('sessionId');
+        const reqUrl = new URL(`http://localhost${req.url}`);
+        const adminView = reqUrl.searchParams.get('admin') === 'true';
+        const sessionId = reqUrl.searchParams.get('sessionId');
 
         // Parse connection string
         const connStringParts = {};
@@ -115,65 +117,91 @@ module.exports = async function (context, req) {
 };
 
 async function getFromAzureTable(accountName, accountKey, tableName, sessionId, context) {
-    try {
-        let url = `https://${accountName}.table.core.windows.net/${tableName}`;
-        
-        // Add filter for specific sessionId if provided
-        if (sessionId) {
-            url += `?$filter=RowKey eq '${sessionId}'`;
-        }
-        
-        const dateString = new Date().toUTCString();
-        
-        // Create authorization signature for GET
-        const stringToSign = `GET\n\n\n${dateString}\n/${accountName}/${tableName}`;
-        const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
-            .update(stringToSign)
-            .digest('base64');
-        
-        const authHeader = `SharedKey ${accountName}:${signature}`;
-        
-        context.log('Making request to Azure Tables:', url);
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': authHeader,
-                'Accept': 'application/json;odata=minimalmetadata',
-                'x-ms-date': dateString,
-                'x-ms-version': '2020-04-08'
+    return new Promise((resolve, reject) => {
+        try {
+            let path = `/${tableName}`;
+            
+            // Add filter for specific sessionId if provided
+            if (sessionId) {
+                path += `?$filter=RowKey eq '${sessionId}'`;
             }
-        });
+            
+            const dateString = new Date().toUTCString();
+            
+            // Create authorization signature for GET
+            const stringToSign = `GET\n\n\n${dateString}\n/${accountName}${path}`;
+            const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
+                .update(stringToSign)
+                .digest('base64');
+            
+            const authHeader = `SharedKey ${accountName}:${signature}`;
+            
+            const options = {
+                hostname: `${accountName}.table.core.windows.net`,
+                port: 443,
+                path: path,
+                method: 'GET',
+                headers: {
+                    'Authorization': authHeader,
+                    'Accept': 'application/json;odata=minimalmetadata', 
+                    'x-ms-date': dateString,
+                    'x-ms-version': '2020-04-08'
+                }
+            };
+            
+            context.log('Making HTTPS request to Azure Tables:', options.hostname + options.path);
+            
+            const req = https.request(options, (res) => {
+                let body = '';
+                
+                res.on('data', (chunk) => {
+                    body += chunk;
+                });
+                
+                res.on('end', () => {
+                    context.log('Azure Tables response status:', res.statusCode);
+                    
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        try {
+                            const responseData = JSON.parse(body);
+                            const assessments = responseData.value || [];
+                            
+                            // Transform entities back to our format
+                            const transformedAssessments = assessments.map(entity => ({
+                                managerName: entity.managerName,
+                                axeTeam: entity.axeTeam,
+                                assessedStage: entity.assessedStage,
+                                suggestedStage: entity.suggestedStage,
+                                scores: entity.scores ? JSON.parse(entity.scores) : [],
+                                timestamp: entity.timestamp,
+                                assessmentDate: entity.assessmentDate,
+                                assessmentTime: entity.assessmentTime,
+                                sessionId: entity.sessionId,
+                                assessmentFinalized: entity.assessmentFinalized
+                            }));
+                            
+                            resolve({ success: true, data: transformedAssessments });
+                        } catch (parseError) {
+                            context.log.error('Error parsing response:', parseError);
+                            resolve({ success: false, error: 'Failed to parse response: ' + parseError.message });
+                        }
+                    } else {
+                        context.log('Azure Tables error response:', body);
+                        resolve({ success: false, error: `Azure Tables error: ${res.statusCode} - ${body}` });
+                    }
+                });
+            });
+            
+            req.on('error', (error) => {
+                context.log.error('HTTPS request error:', error);
+                resolve({ success: false, error: error.message });
+            });
+            
+            req.end();
 
-        context.log('Azure Tables response status:', response.status);
-        
-        if (response.ok) {
-            const responseData = await response.json();
-            const assessments = responseData.value || [];
-            
-            // Transform entities back to our format
-            const transformedAssessments = assessments.map(entity => ({
-                managerName: entity.managerName,
-                axeTeam: entity.axeTeam,
-                assessedStage: entity.assessedStage,
-                suggestedStage: entity.suggestedStage,
-                scores: entity.scores ? JSON.parse(entity.scores) : [],
-                timestamp: entity.timestamp,
-                assessmentDate: entity.assessmentDate,
-                assessmentTime: entity.assessmentTime,
-                sessionId: entity.sessionId,
-                assessmentFinalized: entity.assessmentFinalized
-            }));
-            
-            return { success: true, data: transformedAssessments };
-        } else {
-            const errorText = await response.text();
-            context.log('Azure Tables error response:', errorText);
-            return { success: false, error: `Azure Tables error: ${response.status} - ${errorText}` };
+        } catch (error) {
+            context.log.error('Error in getFromAzureTable:', error);
+            resolve({ success: false, error: error.message });
         }
-
-    } catch (error) {
-        context.log.error('Error in getFromAzureTable:', error);
-        return { success: false, error: error.message };
-    }
+    });
 }

@@ -1,5 +1,6 @@
 // Use direct Azure Tables REST API instead of SDK
 const crypto = require('crypto');
+const https = require('https');
 
 module.exports = async function (context, req) {
     context.log(`Submit assessment function started for URL: ${req.url}`);
@@ -124,44 +125,68 @@ module.exports = async function (context, req) {
 };
 
 async function saveToAzureTable(accountName, accountKey, tableName, entity, context) {
-    try {
-        const url = `https://${accountName}.table.core.windows.net/${tableName}`;
-        const dateString = new Date().toUTCString();
-        
-        // Create authorization signature
-        const stringToSign = `POST\n\napplication/json\n${dateString}\n/${accountName}/${tableName}`;
-        const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
-            .update(stringToSign)
-            .digest('base64');
-        
-        const authHeader = `SharedKey ${accountName}:${signature}`;
-        
-        context.log('Making request to Azure Tables:', url);
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': authHeader,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json;odata=minimalmetadata',
-                'x-ms-date': dateString,
-                'x-ms-version': '2020-04-08'
-            },
-            body: JSON.stringify(entity)
-        });
+    return new Promise((resolve, reject) => {
+        try {
+            const path = `/${tableName}`;
+            const dateString = new Date().toUTCString();
+            const bodyData = JSON.stringify(entity);
+            
+            // Create authorization signature
+            const stringToSign = `POST\n\napplication/json\n${dateString}\n/${accountName}${path}`;
+            const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
+                .update(stringToSign)
+                .digest('base64');
+            
+            const authHeader = `SharedKey ${accountName}:${signature}`;
+            
+            const options = {
+                hostname: `${accountName}.table.core.windows.net`,
+                port: 443,
+                path: path,
+                method: 'POST',
+                headers: {
+                    'Authorization': authHeader,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json;odata=minimalmetadata',
+                    'x-ms-date': dateString,
+                    'x-ms-version': '2020-04-08',
+                    'Content-Length': Buffer.byteLength(bodyData)
+                }
+            };
+            
+            context.log('Making HTTPS request to Azure Tables:', options.hostname + options.path);
+            
+            const req = https.request(options, (res) => {
+                let body = '';
+                
+                res.on('data', (chunk) => {
+                    body += chunk;
+                });
+                
+                res.on('end', () => {
+                    context.log('Azure Tables response status:', res.statusCode);
+                    
+                    if ((res.statusCode >= 200 && res.statusCode < 300) || res.statusCode === 409) {
+                        // 409 = already exists, which is fine
+                        resolve({ success: true });
+                    } else {
+                        context.log('Azure Tables error response:', body);
+                        resolve({ success: false, error: `Azure Tables error: ${res.statusCode} - ${body}` });
+                    }
+                });
+            });
+            
+            req.on('error', (error) => {
+                context.log.error('HTTPS request error:', error);
+                resolve({ success: false, error: error.message });
+            });
+            
+            req.write(bodyData);
+            req.end();
 
-        context.log('Azure Tables response status:', response.status);
-        
-        if (response.ok || response.status === 409) { // 409 = already exists, which is fine
-            return { success: true };
-        } else {
-            const errorText = await response.text();
-            context.log('Azure Tables error response:', errorText);
-            return { success: false, error: `Azure Tables error: ${response.status} - ${errorText}` };
+        } catch (error) {
+            context.log.error('Error in saveToAzureTable:', error);
+            resolve({ success: false, error: error.message });
         }
-
-    } catch (error) {
-        context.log.error('Error in saveToAzureTable:', error);
-        return { success: false, error: error.message };
-    }
+    });
 }

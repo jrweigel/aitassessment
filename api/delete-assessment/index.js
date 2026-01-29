@@ -1,5 +1,7 @@
 // Use direct Azure Tables REST API instead of SDK
 const crypto = require('crypto');
+const https = require('https');
+const { URL } = require('url');
 
 module.exports = async function (context, req) {
     context.log(`Delete assessment function started for URL: ${req.url}`);
@@ -39,9 +41,9 @@ module.exports = async function (context, req) {
         }
 
         // Parse query parameters
-        const url = new URL(`http://localhost${req.url}`);
-        const sessionId = url.searchParams.get('sessionId');
-        const partitionKey = url.searchParams.get('partitionKey'); // axeTeam
+        const reqUrl = new URL(`http://localhost${req.url}`);
+        const sessionId = reqUrl.searchParams.get('sessionId');
+        const partitionKey = reqUrl.searchParams.get('partitionKey'); // axeTeam
 
         if (!sessionId || !partitionKey) {
             context.res.status = 400;
@@ -93,41 +95,63 @@ module.exports = async function (context, req) {
 };
 
 async function deleteFromAzureTable(accountName, accountKey, tableName, partitionKey, rowKey, context) {
-    try {
-        const url = `https://${accountName}.table.core.windows.net/${tableName}(PartitionKey='${partitionKey}',RowKey='${rowKey}')`;
-        const dateString = new Date().toUTCString();
-        
-        // Create authorization signature for DELETE
-        const stringToSign = `DELETE\n\n\n${dateString}\n/${accountName}/${tableName}(PartitionKey='${partitionKey}',RowKey='${rowKey}')`;
-        const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
-            .update(stringToSign)
-            .digest('base64');
-        
-        const authHeader = `SharedKey ${accountName}:${signature}`;
-        
-        context.log('Making delete request to Azure Tables:', url);
-        
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': authHeader,
-                'x-ms-date': dateString,
-                'x-ms-version': '2020-04-08',
-                'If-Match': '*'
-            }
-        });
+    return new Promise((resolve, reject) => {
+        try {
+            const path = `/${tableName}(PartitionKey='${partitionKey}',RowKey='${rowKey}')`;
+            const dateString = new Date().toUTCString();
+            
+            // Create authorization signature for DELETE
+            const stringToSign = `DELETE\n\n\n${dateString}\n/${accountName}${path}`;
+            const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
+                .update(stringToSign)
+                .digest('base64');
+            
+            const authHeader = `SharedKey ${accountName}:${signature}`;
+            
+            const options = {
+                hostname: `${accountName}.table.core.windows.net`,
+                port: 443,
+                path: path,
+                method: 'DELETE',
+                headers: {
+                    'Authorization': authHeader,
+                    'x-ms-date': dateString,
+                    'x-ms-version': '2020-04-08',
+                    'If-Match': '*'
+                }
+            };
+            
+            context.log('Making HTTPS delete request to Azure Tables:', options.hostname + options.path);
+            
+            const req = https.request(options, (res) => {
+                let body = '';
+                
+                res.on('data', (chunk) => {
+                    body += chunk;
+                });
+                
+                res.on('end', () => {
+                    context.log('Azure Tables delete response status:', res.statusCode);
+                    
+                    if ((res.statusCode >= 200 && res.statusCode < 300) || res.statusCode === 404) {
+                        // 404 = already deleted
+                        resolve({ success: true });
+                    } else {
+                        resolve({ success: false, error: `Azure Tables error: ${res.statusCode} - ${body}` });
+                    }
+                });
+            });
+            
+            req.on('error', (error) => {
+                context.log.error('HTTPS request error:', error);
+                resolve({ success: false, error: error.message });
+            });
+            
+            req.end();
 
-        context.log('Azure Tables delete response status:', response.status);
-        
-        if (response.ok || response.status === 404) { // 404 = already deleted
-            return { success: true };
-        } else {
-            const errorText = await response.text();
-            return { success: false, error: `Azure Tables error: ${response.status} - ${errorText}` };
+        } catch (error) {
+            context.log.error('Error in deleteFromAzureTable:', error);
+            resolve({ success: false, error: error.message });
         }
-
-    } catch (error) {
-        context.log.error('Error in deleteFromAzureTable:', error);
-        return { success: false, error: error.message };
-    }
+    });
 }
