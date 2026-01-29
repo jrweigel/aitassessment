@@ -1,11 +1,6 @@
-module.exports = async function (context, req) {
-    context.log('Minimal test function executed');
-    
+module.exports = function (context, req) {
     context.res = {
-        status: 200,
-        headers: {
-            'Content-Type': 'text/plain'
-        },
-        body: 'OK - Minimal Test Working'
+        body: "Hello World"
     };
+    context.done();
 };
