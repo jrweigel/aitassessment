@@ -1,8 +1,8 @@
 module.exports = async function (context, req) {
-    context.log('Health check function started');
+    context.log('Health check function started - simplified version');
 
     try {
-        // Set CORS headers
+        // Set CORS headers first
         context.res = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -12,28 +12,21 @@ module.exports = async function (context, req) {
             }
         };
 
-        // Handle CORS preflight
+        // Handle CORS preflight immediately
         if (req.method === 'OPTIONS') {
             context.res.status = 200;
             context.res.body = '';
             return;
         }
 
-        // Check environment variables
-        const hasStorageConnection = !!process.env.AZURE_STORAGE_CONNECTION_STRING;
-        
-        // Simple health check without dependencies
+        // Very basic success response
         context.res.status = 200;
         context.res.body = JSON.stringify({
             status: 'healthy',
             timestamp: new Date().toISOString(),
-            environment: {
-                nodeVersion: process.version,
-                hasStorageConnection: hasStorageConnection,
-                platform: process.platform
-            },
-            message: 'Azure Functions working - Node.js 18'
+            message: 'Health check working'
         });
+        
     } catch (error) {
         context.log.error('Health check error:', error);
         context.res.status = 500;
