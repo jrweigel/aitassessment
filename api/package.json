@@ -1,7 +1,7 @@
 {
   "name": "ait-assessment-api",
   "version": "1.0.0",
-  "description": "Azure Functions API for AI Transformation Assessment Tool",
+  "description": "Azure Functions API for AI Transformation Assessment Tool - Updated",
   "main": "index.js",
   "scripts": {
     "start": "func start",
