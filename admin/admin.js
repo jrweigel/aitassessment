@@ -122,8 +122,8 @@ class AdminDashboard {
                 <td>${assessment.managerName}</td>
                 <td>${assessment.axeTeam}</td>
                 <td>
-                    <span class="stage-badge stage-${assessment.assessedStage}">
-                        Stage ${assessment.assessedStage}
+                    <span class="stage-badge stage-${assessment.assessedStage || assessment.suggestedStage}">
+                        Stage ${assessment.assessedStage || assessment.suggestedStage}
                     </span>
                 </td>
                 <td>
@@ -188,7 +188,7 @@ class AdminDashboard {
                 <td><strong>${this.escapeHtml(assessment.managerName)}</strong></td>
                 <td><span class="team-badge">${assessment.axeTeam}</span></td>
                 <td>${new Date(assessment.timestamp).toLocaleDateString()}</td>
-                <td><span class="stage-badge stage-${assessment.assessedStage}">Stage ${assessment.assessedStage}</span></td>
+                <td><span class="stage-badge stage-${assessment.assessedStage || assessment.suggestedStage}">Stage ${assessment.assessedStage || assessment.suggestedStage}</span></td>
                 <td><span class="stage-badge stage-${assessment.suggestedStage}">Stage ${assessment.suggestedStage}</span></td>
                 <td><span class="scores-display">[${assessment.scores.join(', ')}]</span></td>
                 <td>
@@ -256,12 +256,13 @@ class AdminDashboard {
         // Only use finalized assessments for analytics
         const finalizedAssessments = this.assessmentData.filter(assessment => 
             assessment.assessmentFinalized === true && 
-            assessment.assessedStage !== null
+            assessment.assessedStage !== null || assessment.suggestedStage !== null
         );
         
         // Analyze team final choice vs suggested stages
         const progressionData = finalizedAssessments.reduce((acc, assessment) => {
-            const diff = assessment.assessedStage - assessment.suggestedStage;
+            const finalStage = assessment.assessedStage || assessment.suggestedStage;
+            const diff = finalStage - assessment.suggestedStage;
             if (diff > 0) acc.overestimated++;
             else if (diff < 0) acc.underestimated++;
             else acc.accurate++;
@@ -408,7 +409,7 @@ class AdminDashboard {
         this.filteredData = this.assessmentData.filter(assessment => {
             const matchesSearch = assessment.managerName.toLowerCase().includes(searchTerm);
             const matchesTeam = !teamFilter || assessment.axeTeam === teamFilter;
-            const matchesStage = !stageFilter || assessment.assessedStage.toString() === stageFilter;
+            const matchesStage = !stageFilter || (assessment.assessedStage || assessment.suggestedStage).toString() === stageFilter;
             
             return matchesSearch && matchesTeam && matchesStage;
         });
@@ -461,7 +462,7 @@ Assessment Details:
 Manager: ${assessment.managerName}
 Team: ${assessment.axeTeam}
 Date: ${new Date(assessment.timestamp).toLocaleString()}
-Self-Assessed Stage: ${assessment.assessedStage}
+Self-Assessed Stage: ${assessment.assessedStage || assessment.suggestedStage}
 Suggested Stage: ${assessment.suggestedStage}
 Individual Scores: ${assessment.scores.join(', ')}
 Session ID: ${assessment.sessionId}
@@ -480,7 +481,7 @@ Session ID: ${assessment.sessionId}
             'Assessment Date': new Date(assessment.timestamp).toLocaleDateString(),
             'Manager Name': assessment.managerName,
             'AX&E Team': assessment.axeTeam,
-            'Self-Assessed Stage': assessment.assessedStage,
+            'Self-Assessed Stage': assessment.assessedStage || assessment.suggestedStage,
             'Suggested Stage': assessment.suggestedStage,
             'Question 1 Score': assessment.scores[0] || '',
             'Question 2 Score': assessment.scores[1] || '',

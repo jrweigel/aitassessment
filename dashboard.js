@@ -269,7 +269,7 @@ class TransformationDashboard {
         const csvData = this.assessmentData.map(assessment => ({
             'Assessment Date': new Date(assessment.timestamp).toLocaleDateString(),
             'AX&E Team': assessment.axeTeam,
-            'Assessed Stage': assessment.assessedStage,
+            'Assessed Stage': assessment.assessedStage || assessment.suggestedStage,
             'Suggested Stage': assessment.suggestedStage,
             'Average Score': this.calculateAverageScore(assessment.scores),
             'Session ID': assessment.sessionId
