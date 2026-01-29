@@ -6,22 +6,17 @@ let assessmentTool = null;
 
 // Global function for button click - defined immediately
 function startAssessment() {
-    const debugEl = document.getElementById('debug-info');
-    if (debugEl) debugEl.textContent = 'Button clicked! Starting assessment...';
-    
     if (assessmentTool) {
         assessmentTool.startUpfrontAssessment();
     } else if (window.assessmentTool) {
         window.assessmentTool.startUpfrontAssessment();
     } else {
-        if (debugEl) debugEl.textContent = 'Assessment tool not ready, initializing now...';
         // Try to initialize now
         try {
             assessmentTool = new AITransformationAssessment();
             window.assessmentTool = assessmentTool;
             assessmentTool.startUpfrontAssessment();
         } catch (error) {
-            if (debugEl) debugEl.textContent = 'Error: ' + error.message;
             console.error('Assessment initialization error:', error);
         }
     }
@@ -33,12 +28,7 @@ class AITransformationAssessment {
         this.assessmentData = {};
         this.currentSection = 'start';
         
-        const debugEl = document.getElementById('debug-info');
-        if (debugEl) debugEl.textContent = 'Assessment tool initializing...';
-        
         this.init();
-        
-        if (debugEl) debugEl.textContent = 'Assessment tool ready! Click "Begin Assessment" to start.';
     }
 
     init() {
@@ -162,19 +152,14 @@ class AITransformationAssessment {
     }
 
     startUpfrontAssessment() {
-        const debugEl = document.getElementById('debug-info');
-        if (debugEl) debugEl.textContent = 'Loading assessment questions...';
-        
         this.hideAllSections();
         const assessmentSection = document.getElementById('assessment-section');
         if (assessmentSection) {
             assessmentSection.classList.remove('hidden');
             this.loadUpfrontAssessmentContent();
             this.currentSection = 'assessment';
-            
-            if (debugEl) debugEl.textContent = 'Assessment loaded successfully!';
         } else {
-            if (debugEl) debugEl.textContent = 'Error: Could not find assessment section';
+            console.error('Assessment section not found');
         }
     }
 
@@ -322,153 +307,6 @@ class AITransformationAssessment {
                     "\"What does this actually do?\"",
                     "\"What tool should I use?\"",
                     "\"I'm still learning the basics\""
-                ]
-            },
-            2: {
-                title: "Stage 2: Riding with Training Wheels",
-                subtitle: "safe adoption", 
-                description: "People are riding confidently, but the training wheels keep them upright. Helmets are on, rules are being learned, and falls are unlikely.",
-                whatItLooks: [
-                    "AI is used regularly with clear guardrails",
-                    "People know what's allowed, what to check, and when to double-check results"
-                ],
-                peopleAreSaying: [
-                    "\"This saves me time.\"",
-                    "\"I use it, but double-check.\""
-                ]
-            },
-            3: {
-                title: "Stage 3: Training Wheels Off",
-                subtitle: "operating differently",
-                description: "The training wheels are gone. People can ride on their own, but they're still thinking about maintaing balance, and the right hand signals.",
-                whatItLooks: [
-                    "This is a turning point: workflows are changing, AI is assumed rather than optional",
-                    "Human oversight remains essential, and people are rethinking work processes"
-                ],
-                peopleAreSaying: [
-                    "\"We don't do this the old way anymore.\"",
-                    "\"AI handles this part; I handle that.\""
-                ]
-            },
-            4: {
-                title: "Stage 4: Making the Bike Yours",
-                subtitle: "designed for our business",
-                description: "The bike is being modified on purpose — adding a basket or beads on the spokes, customizing the seat, paint, and handlebars. Each upgrade changes how it feels, and riders are adapting.",
-                whatItLooks: [
-                    "Teams now create purpose-built agents, automations, and integrations with AI embedded directly into workflows",
-                    "These are deliberate, not experimental, solutions"
-                ],
-                peopleAreSaying: [
-                    "\"This fits how we work.\"",
-                    "\"We built this for our needs.\""
-                ]
-            },
-            5: {
-                title: "Stage 5: Riding Without Thinking",
-                subtitle: "default operating model",
-                description: "People hop on and ride to the store or a friend's house without thinking about pedaling or balance. Riding is automatic.",
-                whatItLooks: [
-                    "AI is integrated by default, with defined ownership, metrics, and upkeep",
-                    "Continuous improvement occurs as a natural part of workflow"
-                ],
-                peopleAreSaying: [
-                    "\"Of course AI is involved.\"",
-                    "\"We don't even think about it anymore.\""
-                ]
-            }
-        };
-        
-        return stageDetails[stage] || stageDetails[1];
-    }
-    getUpfrontAssessmentContent() {
-        return `
-            <div class="assessment-form">
-                <h2>AI Transformation Assessment</h2>
-                <p class="assessment-intro">Answer these questions about your team's current AI usage patterns.</p>
-                
-                <form id="assessment-form">
-                    <div class="question-group">
-                        <h3>How often does your team currently use AI tools in daily work?</h3>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="usage_frequency" value="0" required>
-                                <span>Never or rarely - we're still figuring out access and setup</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="usage_frequency" value="1" required>
-                                <span>Occasionally - some team members experiment inconsistently</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="usage_frequency" value="2" required>
-                                <span>Regularly - most team members use AI for specific tasks</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="usage_frequency" value="3" required>
-                                <span>Continuously - AI is integrated into most workflows</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="question-group">
-                        <h3>How much oversight and validation does AI-generated work require?</h3>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="oversight_level" value="0" required>
-                                <span>Significant manual review and validation for everything</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="oversight_level" value="1" required>
-                                <span>Regular spot-checking with established review processes</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="oversight_level" value="2" required>
-                                <span>Periodic oversight with trust for routine tasks</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="oversight_level" value="3" required>
-                                <span>Minimal oversight - AI outputs are trusted by default</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="team-info">
-                        <div class="form-group">
-                            <label for="manager-name">Name of the manager for the team you're assessing</label>
-                            <input type="text" id="manager-name" name="managerName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="axe-team">Select your org</label>
-                            <select id="axe-team" name="axeTeam" required>
-                                <option value="">Select your organization...</option>
-                                <option value="CXS">Cloud Experience Studio</option>
-                                <option value="DevRel">Developer Relations</option>
-                                <option value="Product">AX&E Product</option>
-                                <option value="Eng">AX&E Engineering</option>
-                                <option value="Learn">Learn</option>
-                                <option value="Startups">Startups</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="submit-assessment">Complete Assessment</button>
-                </form>
-            </div>
-        `;
-    }
-
-    getStageDetailContent(stage) {
-        const stageDetails = {
-            1: {
-                title: "Stage 1: Unboxing & Assembling the Bike",
-                subtitle: "foundations",
-                description: "The bike is unboxed and parts are being examined, adjusted, and assembled. People might be climbing on the bike, but no one is riding yet.",
-                whatItLooks: [
-                    "Tool access, complete basic training, and learn AI's real capabilities through initial experiments and demos"
-                ],
-                peopleAreSaying: [
-                    "\"What does this actually do?\"",
-                    "\"What tool should I use?\"",
-                    "\"I'm still learning the basics\""
                 ],
                 notPastThisStage: [
                     "Many lack access or setup, and there is confusion over tools and permissions",
@@ -576,7 +414,86 @@ class AITransformationAssessment {
             }
         };
         
-        const stageData = stageDetails[stage] || stageDetails[1];
+        return stageDetails[stage] || stageDetails[1];
+    }
+    getUpfrontAssessmentContent() {
+        return `
+            <div class="assessment-form">
+                <h2>AI Transformation Assessment</h2>
+                <p class="assessment-intro">Answer these questions about your team's current AI usage patterns.</p>
+                
+                <form id="assessment-form">
+                    <div class="question-group">
+                        <h3>How often does your team currently use AI tools in daily work?</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="usage_frequency" value="0" required>
+                                <span>Never or rarely - we're still figuring out access and setup</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="usage_frequency" value="1" required>
+                                <span>Occasionally - some team members experiment inconsistently</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="usage_frequency" value="2" required>
+                                <span>Regularly - most team members use AI for specific tasks</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="usage_frequency" value="3" required>
+                                <span>Continuously - AI is integrated into most workflows</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <h3>How much oversight and validation does AI-generated work require?</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="oversight_level" value="0" required>
+                                <span>Significant manual review and validation for everything</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="oversight_level" value="1" required>
+                                <span>Regular spot-checking with established review processes</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="oversight_level" value="2" required>
+                                <span>Periodic oversight with trust for routine tasks</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="oversight_level" value="3" required>
+                                <span>Minimal oversight - AI outputs are trusted by default</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="team-info">
+                        <div class="form-group">
+                            <label for="manager-name">Name of the manager for the team you're assessing</label>
+                            <input type="text" id="manager-name" name="managerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="axe-team">Select your org</label>
+                            <select id="axe-team" name="axeTeam" required>
+                                <option value="">Select your organization...</option>
+                                <option value="CXS">Cloud Experience Studio</option>
+                                <option value="DevRel">Developer Relations</option>
+                                <option value="Product">AX&E Product</option>
+                                <option value="Eng">AX&E Engineering</option>
+                                <option value="Learn">Learn</option>
+                                <option value="Startups">Startups</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-assessment">Complete Assessment</button>
+                </form>
+            </div>
+        `;
+    }
+
+    getStageDetailContent(stage) {
+        const stageData = this.getStageData(stage);
         
         return `
             <div class="stage-detail">
@@ -909,35 +826,39 @@ class AITransformationAssessment {
         this.showFinalConfirmation(finalResult);
     }
 
-    showSaveNotification(message) {
-        // Create notification element if it doesn't exist
-        let notification = document.getElementById('save-notification');
-        if (!notification) {
-            notification = document.createElement('div');
-            notification.id = 'save-notification';
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #f97316;
-                color: white;
-                padding: 12px 16px;
-                border-radius: 6px;
-                font-size: 14px;
-                z-index: 10000;
-                max-width: 300px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            `;
-            document.body.appendChild(notification);
+    showNotification(message, type = 'info', duration = 5000) {
+        // Remove any existing notifications
+        const existingNotification = document.getElementById('app-notification');
+        if (existingNotification) {
+            existingNotification.remove();
         }
         
-        notification.textContent = message;
-        notification.style.display = 'block';
+        // Create new notification
+        const notification = document.createElement('div');
+        notification.id = 'app-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 10000;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: ${type === 'error' ? '#dc2626' : type === 'warning' ? '#f97316' : '#2563eb'};
+            color: white;
+        `;
         
-        // Auto-hide after 5 seconds
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Auto-hide after specified duration
         setTimeout(() => {
-            notification.style.display = 'none';
-        }, 5000);
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, duration);
     }
 
     showFinalConfirmation(result) {
@@ -991,7 +912,7 @@ class AITransformationAssessment {
         } catch (error) {
             console.error('Failed to save to Azure, data saved locally only:', error);
             // Show user notification that data is saved locally
-            this.showSaveNotification('Assessment saved locally. Data will sync when connection is restored.');
+            this.showNotification('Assessment saved locally. Data will sync when connection is restored.', 'warning');
         }
     }
 
@@ -1028,37 +949,27 @@ if (document.readyState === 'loading') {
 }
 
 function initializeAssessment() {
-    const debugEl = document.getElementById('debug-info');
-    if (debugEl) debugEl.textContent = 'Initializing assessment tool...';
-    
     try {
         assessmentTool = new AITransformationAssessment();
         window.assessmentTool = assessmentTool; // Make it globally available
-        if (debugEl) debugEl.textContent = 'Assessment tool ready!';
     } catch (error) {
-        if (debugEl) debugEl.textContent = 'Initialization error: ' + error.message;
+        console.error('Assessment initialization error:', error);
     }
 }
 
 // Global functions for footer navigation
 function showFrameworkOverview() {
-    console.log('showFrameworkOverview called, assessmentTool:', window.assessmentTool);
     if (window.assessmentTool) {
         window.assessmentTool.showFrameworkOverview();
     } else {
         console.error('Assessment tool not initialized');
-        const debugEl = document.getElementById('debug-info');
-        if (debugEl) debugEl.textContent = 'Error: Assessment tool not ready';
     }
 }
 
 function showAllStages() {
-    console.log('showAllStages called, assessmentTool:', window.assessmentTool);
     if (window.assessmentTool) {
         window.assessmentTool.showAllStagesOverview();
     } else {
         console.error('Assessment tool not initialized');
-        const debugEl = document.getElementById('debug-info');
-        if (debugEl) debugEl.textContent = 'Error: Assessment tool not ready';
     }
 }

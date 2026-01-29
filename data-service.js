@@ -3,24 +3,19 @@
 
 class AssessmentDataService {
     constructor() {
-        // API endpoints with fallback to standalone Functions app
-        this.apiBaseUrls = [
-            'https://aitassessment-api.azurewebsites.net/api',  // Standalone Functions app (working)
-            '/api'  // Static Web App API (fallback)
-        ];
+        // Use local API for development, deployed API for production
+        this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? '/api' 
+            : window.location.protocol + '//' + window.location.host + '/api';
         
-        this.currentApiBaseUrl = this.apiBaseUrls[0]; // Start with standalone Functions app
-        
-        console.log('AssessmentDataService initialized with API URLs:', this.apiBaseUrls);
-        console.log('Current hostname:', window.location.hostname);
-        console.log('Using API base URL:', this.currentApiBaseUrl);
+        console.log('AssessmentDataService initialized with API URL:', this.apiBaseUrl);
     }
 
     async submitAssessment(assessmentData) {
         console.log('submitAssessment called with:', assessmentData);
         
         try {
-            const response = await fetch(`${this.currentApiBaseUrl}/submit-assessment`, {
+            const response = await fetch(`${this.apiBaseUrl}/submit-assessment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +67,7 @@ class AssessmentDataService {
             if (options.admin) params.append('admin', 'true');
             if (options.sessionId) params.append('sessionId', options.sessionId);
 
-            const response = await fetch(`${this.currentApiBaseUrl}/get-assessments?${params}`);
+            const response = await fetch(`${this.apiBaseUrl}/get-assessments?${params}`);
             const result = await response.json();
             
             if (!response.ok) {
@@ -94,7 +89,7 @@ class AssessmentDataService {
                 partitionKey: axeTeam
             });
 
-            const response = await fetch(`${this.currentApiBaseUrl}/delete-assessment?${params}`, {
+            const response = await fetch(`${this.apiBaseUrl}/delete-assessment?${params}`, {
                 method: 'DELETE'
             });
 
@@ -136,7 +131,7 @@ class AssessmentDataService {
     // Check if API is available
     async checkApiHealth() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/get-assessments?admin=false`, {
+            const response = await fetch(`${this.apiBaseUrl}/health-check`, {
                 method: 'HEAD'
             });
             return response.ok;
