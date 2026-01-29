@@ -1,6 +1,6 @@
 module.exports = function (context, req) {
     context.res = {
-        body: "Hello World"
+        body: "Hello World - Functions Enabled"
     };
     context.done();
 };
