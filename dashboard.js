@@ -39,10 +39,10 @@ class TransformationDashboard {
                 return new Date(assessment.timestamp) >= ninetyDaysAgo;
             });
             
-            // Keep only latest assessment per team
+            // Keep only latest assessment per team (use sessionId since managerName is removed for non-admin)
             const latestByTeam = {};
             recentData.forEach(assessment => {
-                const key = `${assessment.axeTeam}_${assessment.managerName || 'unknown'}`;
+                const key = assessment.sessionId || `${assessment.axeTeam}_${Date.now()}`;
                 if (!latestByTeam[key] || new Date(assessment.timestamp) > new Date(latestByTeam[key].timestamp)) {
                     latestByTeam[key] = assessment;
                 }
@@ -65,10 +65,10 @@ class TransformationDashboard {
                 return new Date(assessment.timestamp) >= ninetyDaysAgo;
             });
             
-            // Keep only latest assessment per team
+            // Keep only latest assessment per team (use sessionId for uniqueness)
             const latestByTeam = {};
             recentData.forEach(assessment => {
-                const key = `${assessment.axeTeam}_${assessment.managerName}`;
+                const key = assessment.sessionId || `${assessment.axeTeam}_${Date.now()}`;
                 if (!latestByTeam[key] || new Date(assessment.timestamp) > new Date(latestByTeam[key].timestamp)) {
                     latestByTeam[key] = assessment;
                 }
