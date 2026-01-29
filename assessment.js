@@ -138,8 +138,15 @@ class AITransformationAssessment {
     }
 
     showStageDetail(stage) {
+        console.log(`showStageDetail called with stage: ${stage}`);
         this.hideAllSections();
-        document.getElementById('stage-detail-section').classList.remove('hidden');
+        const stageDetailSection = document.getElementById('stage-detail-section');
+        if (stageDetailSection) {
+            stageDetailSection.classList.remove('hidden');
+            console.log('Stage detail section shown');
+        } else {
+            console.error('stage-detail-section element not found!');
+        }
         this.loadStageDetail(stage);
         this.addStageNavigation(stage);
         this.currentSection = 'stage-detail';
@@ -175,8 +182,16 @@ class AITransformationAssessment {
     }
 
     loadStageDetail(stage) {
+        console.log(`loadStageDetail called with stage: ${stage}`);
         const stageContent = this.getStageDetailContent(stage);
-        document.getElementById('stage-detail-content').innerHTML = stageContent;
+        console.log('Generated stage content length:', stageContent.length);
+        const contentElement = document.getElementById('stage-detail-content');
+        if (contentElement) {
+            contentElement.innerHTML = stageContent;
+            console.log('Stage content loaded successfully');
+        } else {
+            console.error('stage-detail-content element not found!');
+        }
     }
     showAllStagesOverview() {
         this.hideAllSections();
@@ -493,7 +508,14 @@ class AITransformationAssessment {
     }
 
     getStageDetailContent(stage) {
+        console.log(`getStageDetailContent called with stage: ${stage}`);
         const stageData = this.getStageData(stage);
+        console.log('Retrieved stage data:', stageData?.title || 'No title found');
+        
+        if (!stageData) {
+            console.error(`No stage data found for stage: ${stage}`);
+            return '<p>Error: Stage data not found</p>';
+        }
         
         return `
             <div class="stage-detail">
