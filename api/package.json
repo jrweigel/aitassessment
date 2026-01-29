@@ -1,16 +1,13 @@
 {
   "name": "ait-assessment-api",
   "version": "1.0.0",
-  "description": "Azure Functions API for AI Transformation Assessment Tool - Updated",
+  "description": "Azure Functions API for AI Transformation Assessment Tool",
   "main": "index.js",
   "scripts": {
     "start": "func start",
-    "build": "echo 'Build complete'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "echo 'Build complete'"
   },
-  "dependencies": {
-  },
-  "devDependencies": {},
+  "dependencies": {},
   "engines": {
     "node": ">=18.0.0"
   }
