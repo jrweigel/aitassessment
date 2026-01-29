@@ -129,7 +129,7 @@ async function getFromAzureTable(accountName, accountKey, tableName, sessionId, 
             const dateString = new Date().toUTCString();
             
             // Create authorization signature for GET (correct Azure Tables format)
-            const stringToSign = `GET\n\n\n\n${dateString}\n/${accountName}${path}`;
+            const stringToSign = `GET\n\n\n${dateString}\n/${accountName}${path}`;
             const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
                 .update(stringToSign)
                 .digest('base64');

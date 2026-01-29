@@ -131,8 +131,8 @@ async function saveToAzureTable(accountName, accountKey, tableName, entity, cont
             const dateString = new Date().toUTCString();
             const bodyData = JSON.stringify(entity);
             
-            // Create authorization signature
-            const stringToSign = `POST\n\napplication/json\n${dateString}\n/${accountName}${path}`;
+            // Create authorization signature (correct Table Storage format)
+            const stringToSign = `POST\n\n\n${dateString}\n/${accountName}${path}`;
             const signature = crypto.createHmac('sha256', Buffer.from(accountKey, 'base64'))
                 .update(stringToSign)
                 .digest('base64');
