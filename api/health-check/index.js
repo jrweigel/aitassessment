@@ -31,6 +31,6 @@ module.exports = async function (context, req) {
             platform: process.platform,
             functionName: context.executionContext?.functionName || 'unknown'
         },
-        message: 'Azure Functions runtime is working correctly'
+        message: 'Azure Functions runtime is working correctly - v1.1'
     });
 };
