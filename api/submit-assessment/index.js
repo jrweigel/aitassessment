@@ -13,29 +13,25 @@ module.exports = async function (context, req) {
         }
     };
 
-    // Handle CORS preflight
-    if (req.method === 'OPTIONS') {
-        context.res.status = 200;
-        context.res.body = '';
-        return;
-    }
-
-    // Only allow POST
-    if (req.method !== 'POST') {
-        context.res.status = 405;
-        context.res.body = JSON.stringify({ error: 'Method not allowed. Use POST.' });
-        return;
-    }
-
     try {
-        // Debug logging for environment variables
-        context.log('Available environment variables:', {
-            hasAzureStorageConnection: !!process.env.AZURE_STORAGE_CONNECTION_STRING,
-            nodeEnv: process.env.NODE_ENV,
-            functionName: context.executionContext?.functionName
-        });
+        // Handle CORS preflight
+        if (req.method === 'OPTIONS') {
+            context.res.status = 200;
+            context.res.body = '';
+            return;
+        }
 
+        // Only allow POST
+        if (req.method !== 'POST') {
+            context.res.status = 405;
+            context.res.body = JSON.stringify({ error: 'Method not allowed. Use POST.' });
+            return;
+        }
+
+        // Debug logging for environment variables
         const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        context.log('Connection string exists:', !!connectionString);
+        
         if (!connectionString) {
             context.log('Azure Storage connection string not configured');
             context.res.status = 503;
@@ -67,18 +63,12 @@ module.exports = async function (context, req) {
             return;
         }
 
+        context.log('Creating table client...');
+        
         // Create table client and ensure table exists
         const tableClient = new TableClient(connectionString, 'aitassessments');
         
-        try {
-            await tableClient.createTable();
-            context.log('Table created or already exists');
-        } catch (tableError) {
-            // Table might already exist, which is fine
-            context.log('Table creation result:', tableError.message);
-        }
-        
-        // Ensure table exists
+        context.log('Creating table if not exists...');
         await tableClient.createTable();
 
         // Prepare entity for Azure Table Storage
@@ -110,12 +100,13 @@ module.exports = async function (context, req) {
         });
 
     } catch (error) {
-        context.log('Error in submit-assessment:', error);
+        context.log.error('Error in submit-assessment:', error);
         context.res.status = 500;
         context.res.body = JSON.stringify({ 
             success: false, 
             error: 'Failed to save assessment data',
-            details: error.message
+            details: error.message,
+            stack: error.stack
         });
     }
 };
