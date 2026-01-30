@@ -574,7 +574,7 @@ class AITransformationAssessment {
                 whatToFocus: [
                     "Make AI the default path, with manual processes as backup",
                     "Redesign key workflows to take advantage of AI capabilities",
-                    "Measure and communicate the value AI brings to work quality and speed"
+                    "Measure and communicate the value AI brings to work quality and speed",
                     "Create feedback loops to improve AI integration",
                     "Share success stories and lessons learned"
                 ],
