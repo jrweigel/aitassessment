@@ -343,19 +343,38 @@ class TransformationDashboard {
     }
 
     refreshData() {
-        this.loadData();
-        this.renderDashboard();
-        
-        // Show refresh confirmation
+        // Show loading state on refresh button
         const refreshBtn = document.getElementById('refresh-data');
         const originalText = refreshBtn.textContent;
-        refreshBtn.textContent = 'Refreshed!';
+        refreshBtn.innerHTML = '⟳ Refreshing...';
         refreshBtn.disabled = true;
         
-        setTimeout(() => {
-            refreshBtn.textContent = originalText;
-            refreshBtn.disabled = false;
-        }, 2000);
+        // Perform data refresh
+        this.loadData().then(() => {
+            this.renderDashboard();
+            
+            // Show success state
+            refreshBtn.innerHTML = '✓ Updated!';
+            refreshBtn.style.background = '#16a34a';
+            
+            setTimeout(() => {
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.style.background = '';
+                refreshBtn.disabled = false;
+            }, 2000);
+            
+        }).catch(error => {
+            console.error('Refresh failed:', error);
+            
+            refreshBtn.innerHTML = '✕ Failed';
+            refreshBtn.style.background = '#dc2626';
+            
+            setTimeout(() => {
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.style.background = '';
+                refreshBtn.disabled = false;
+            }, 2000);
+        });
     }
 
     showOfflineNotification() {

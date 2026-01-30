@@ -142,17 +142,44 @@ class AdminDashboard {
         if (!assessment) return;
         
         if (confirm('Are you sure you want to delete this assessment record?')) {
+            const deleteButton = event.target;
+            const originalButtonText = deleteButton.innerHTML;
+            
+            // Show loading state
+            deleteButton.innerHTML = '⏳';
+            deleteButton.disabled = true;
+            
             try {
                 // Try to delete from Azure first
                 await window.assessmentDataService.deleteAssessment(assessment.sessionId, assessment.axeTeam);
                 console.log('Assessment deleted from Azure successfully');
                 
-                // Refresh data from server to confirm deletion
-                await this.loadData();
-                this.renderAdminDashboard();
+                // Show success feedback
+                deleteButton.innerHTML = '✓';
+                deleteButton.style.background = '#16a34a';
+                
+                // Force a complete data refresh after short delay
+                setTimeout(async () => {
+                    try {
+                        await this.loadData();
+                        this.renderAdminDashboard();
+                        
+                        // Show success message
+                        this.showNotification('Assessment deleted successfully', 'success');
+                        
+                    } catch (refreshError) {
+                        console.error('Error refreshing data after deletion:', refreshError);
+                        this.showNotification('Deleted, but refresh failed. Please click Refresh Log.', 'warning');
+                    }
+                }, 500);
                 
             } catch (error) {
                 console.error('Failed to delete from Azure:', error);
+                
+                // Reset button state
+                deleteButton.innerHTML = originalButtonText;
+                deleteButton.disabled = false;
+                
                 alert('Failed to delete assessment. Please try again.');
             }
         }
@@ -411,6 +438,39 @@ class AdminDashboard {
     refreshData() {
         this.loadData();
         this.renderAdminDashboard();
+    }
+
+    showNotification(message, type = 'info') {
+        // Remove any existing notifications
+        const existing = document.getElementById('action-notification');
+        if (existing) existing.remove();
+        
+        const notification = document.createElement('div');
+        notification.id = 'action-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+            background: ${type === 'success' ? '#16a34a' : type === 'warning' ? '#f97316' : '#2563eb'};
+            color: white;
+        `;
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 4 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => notification.remove(), 300);
+        }, 4000);
     }
 
     showOfflineNotification() {
