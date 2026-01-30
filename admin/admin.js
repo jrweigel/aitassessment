@@ -147,23 +147,14 @@ class AdminDashboard {
                 await window.assessmentDataService.deleteAssessment(assessment.sessionId, assessment.axeTeam);
                 console.log('Assessment deleted from Azure successfully');
                 
+                // Refresh data from server to confirm deletion
+                await this.loadData();
+                this.renderAdminDashboard();
+                
             } catch (error) {
                 console.error('Failed to delete from Azure:', error);
-                // Continue with local deletion anyway
+                alert('Failed to delete assessment. Please try again.');
             }
-            
-            // Remove from current filtered data
-            this.assessmentData = this.assessmentData.filter(a => a.timestamp !== timestamp);
-            this.filteredData = this.filteredData.filter(a => a.timestamp !== timestamp);
-            
-            // Remove from localStorage as backup
-            const storedData = localStorage.getItem('axe-ai-assessments');
-            const allData = storedData ? JSON.parse(storedData) : [];
-            const updatedAllData = allData.filter(a => a.timestamp !== timestamp);
-            localStorage.setItem('axe-ai-assessments', JSON.stringify(updatedAllData));
-            
-            // Re-render the dashboard
-            this.renderAdminDashboard();
         }
     }
 
