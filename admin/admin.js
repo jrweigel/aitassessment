@@ -14,8 +14,8 @@ class AdminDashboard {
         this.init();
     }
 
-    init() {
-        this.loadData();
+    async init() {
+        await this.loadData();
         this.renderAdminDashboard();
         this.bindEvents();
     }
@@ -435,8 +435,8 @@ class AdminDashboard {
         this.renderAssessmentLog();
     }
 
-    refreshData() {
-        this.loadData();
+    async refreshData() {
+        await this.loadData();
         this.renderAdminDashboard();
     }
 

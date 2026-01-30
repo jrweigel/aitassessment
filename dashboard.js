@@ -19,8 +19,8 @@ class TransformationDashboard {
         this.init();
     }
 
-    init() {
-        this.loadData();
+    async init() {
+        await this.loadData();
         this.renderDashboard();
         this.bindEvents();
     }
@@ -29,7 +29,7 @@ class TransformationDashboard {
         try {
             // Try to load data from Azure API
             const allData = await window.assessmentDataService.getAssessments({ admin: false });
-            console.log('Loaded', allData.length, 'assessments from Azure');
+            console.log('Dashboard loadData:', allData.length, 'assessments found from Azure');
             
             // Filter for last 90 days
             const ninetyDaysAgo = new Date();
@@ -39,16 +39,16 @@ class TransformationDashboard {
                 return new Date(assessment.timestamp) >= ninetyDaysAgo;
             });
             
-            // Keep only latest assessment per team (use sessionId since managerName is removed for non-admin)
-            const latestByTeam = {};
+            // Keep only latest assessment per manager (most recent submission per manager name)
+            const latestByManager = {};
             recentData.forEach(assessment => {
-                const key = assessment.sessionId || `${assessment.axeTeam}_${Date.now()}`;
-                if (!latestByTeam[key] || new Date(assessment.timestamp) > new Date(latestByTeam[key].timestamp)) {
-                    latestByTeam[key] = assessment;
+                const managerKey = assessment.managerName || assessment.sessionId || `unknown_${Date.now()}`;
+                if (!latestByManager[managerKey] || new Date(assessment.timestamp) > new Date(latestByManager[managerKey].timestamp)) {
+                    latestByManager[managerKey] = assessment;
                 }
             });
             
-            this.assessmentData = Object.values(latestByTeam);
+            this.assessmentData = Object.values(latestByManager);
             
         } catch (error) {
             console.error('Failed to load data from Azure, falling back to localStorage:', error);
@@ -65,16 +65,16 @@ class TransformationDashboard {
                 return new Date(assessment.timestamp) >= ninetyDaysAgo;
             });
             
-            // Keep only latest assessment per team (use sessionId for uniqueness)
-            const latestByTeam = {};
+            // Keep only latest assessment per manager (most recent submission per manager name)
+            const latestByManager = {};
             recentData.forEach(assessment => {
-                const key = assessment.sessionId || `${assessment.axeTeam}_${Date.now()}`;
-                if (!latestByTeam[key] || new Date(assessment.timestamp) > new Date(latestByTeam[key].timestamp)) {
-                    latestByTeam[key] = assessment;
+                const managerKey = assessment.managerName || assessment.sessionId || `unknown_${Date.now()}`;
+                if (!latestByManager[managerKey] || new Date(assessment.timestamp) > new Date(latestByManager[managerKey].timestamp)) {
+                    latestByManager[managerKey] = assessment;
                 }
             });
             
-            this.assessmentData = Object.values(latestByTeam);
+            this.assessmentData = Object.values(latestByManager);
             
             // Show notification that we're using offline data
             this.showOfflineNotification();
@@ -96,13 +96,13 @@ class TransformationDashboard {
 
     renderOverviewStats() {
         const totalAssessments = this.assessmentData.length;
-        const uniqueTeams = new Set(this.assessmentData.map(a => a.axeTeam)).size;
+        const uniqueManagers = new Set(this.assessmentData.map(a => a.managerName).filter(name => name)).size;
         const latestAssessment = this.assessmentData.length > 0 
             ? new Date(Math.max(...this.assessmentData.map(a => new Date(a.timestamp)))).toLocaleDateString()
             : 'No data';
 
         document.getElementById('total-assessments').textContent = totalAssessments;
-        document.getElementById('teams-assessed').textContent = uniqueTeams;
+        document.getElementById('teams-assessed').textContent = uniqueManagers;
         document.getElementById('latest-assessment').textContent = latestAssessment;
     }
 
@@ -342,15 +342,16 @@ class TransformationDashboard {
         return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
     }
 
-    refreshData() {
+    async refreshData() {
         // Show loading state on refresh button
         const refreshBtn = document.getElementById('refresh-data');
         const originalText = refreshBtn.textContent;
         refreshBtn.innerHTML = '⟳ Refreshing...';
         refreshBtn.disabled = true;
         
-        // Perform data refresh
-        this.loadData().then(() => {
+        try {
+            // Perform data refresh
+            await this.loadData();
             this.renderDashboard();
             
             // Show success state
@@ -363,7 +364,7 @@ class TransformationDashboard {
                 refreshBtn.disabled = false;
             }, 2000);
             
-        }).catch(error => {
+        } catch (error) {
             console.error('Refresh failed:', error);
             
             refreshBtn.innerHTML = '✕ Failed';
@@ -374,7 +375,7 @@ class TransformationDashboard {
                 refreshBtn.style.background = '';
                 refreshBtn.disabled = false;
             }, 2000);
-        });
+        }
     }
 
     showOfflineNotification() {

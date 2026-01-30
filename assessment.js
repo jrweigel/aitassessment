@@ -894,7 +894,7 @@ class AITransformationAssessment {
                         ${this.generateStageOptions(result.suggestedStage)}
                     </div>
                     
-                    <button class="primary-button" id="confirm-assessment" style="margin-top: 1rem;" disabled>
+                    <button class="primary-button confirm-assessment-btn" id="confirm-assessment" style="margin-top: 1.5rem; padding: 16px 32px; font-size: 18px; font-weight: 600; min-height: 60px;" disabled>
                         Confirm Assessment
                     </button>
                 </div>
