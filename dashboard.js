@@ -96,13 +96,11 @@ class TransformationDashboard {
 
     renderOverviewStats() {
         const totalAssessments = this.assessmentData.length;
-        const uniqueManagers = new Set(this.assessmentData.map(a => a.managerName).filter(name => name)).size;
         const latestAssessment = this.assessmentData.length > 0 
             ? new Date(Math.max(...this.assessmentData.map(a => new Date(a.timestamp)))).toLocaleDateString()
             : 'No data';
 
         document.getElementById('total-assessments').textContent = totalAssessments;
-        document.getElementById('teams-assessed').textContent = uniqueManagers;
         document.getElementById('latest-assessment').textContent = latestAssessment;
     }
 
