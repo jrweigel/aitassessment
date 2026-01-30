@@ -6,18 +6,20 @@ let assessmentTool = null;
 
 // Global function for button click - defined immediately
 function startAssessment() {
-    if (assessmentTool) {
-        assessmentTool.startUpfrontAssessment();
-    } else if (window.assessmentTool) {
+    if (window.assessmentTool) {
         window.assessmentTool.startUpfrontAssessment();
+    } else if (assessmentTool) {
+        assessmentTool.startUpfrontAssessment();
     } else {
         // Try to initialize now
         try {
-            assessmentTool = new AITransformationAssessment();
-            window.assessmentTool = assessmentTool;
-            assessmentTool.startUpfrontAssessment();
+            const tool = new AITransformationAssessment();
+            window.assessmentTool = tool;
+            assessmentTool = tool;
+            tool.startUpfrontAssessment();
         } catch (error) {
             console.error('Assessment initialization error:', error);
+            alert('Error starting assessment. Please refresh the page and try again.');
         }
     }
 }
@@ -987,6 +989,18 @@ function initializeAssessment() {
     try {
         assessmentTool = new AITransformationAssessment();
         window.assessmentTool = assessmentTool; // Make it globally available
+
+        // Handle URL fragments for deep linking
+        const hash = window.location.hash;
+        if (hash === '#all-stages' || hash === '#stages-overview') {
+            setTimeout(() => {
+                assessmentTool.showAllStagesOverview();
+            }, 100);
+        } else if (hash === '#framework') {
+            setTimeout(() => {
+                assessmentTool.showFrameworkOverview();
+            }, 100);
+        }
     } catch (error) {
         console.error('Assessment initialization error:', error);
     }
@@ -996,15 +1010,37 @@ function initializeAssessment() {
 function showFrameworkOverview() {
     if (window.assessmentTool) {
         window.assessmentTool.showFrameworkOverview();
+    } else if (assessmentTool) {
+        assessmentTool.showFrameworkOverview();
     } else {
-        console.error('Assessment tool not initialized');
+        // Try to initialize now
+        try {
+            const tool = new AITransformationAssessment();
+            window.assessmentTool = tool;
+            assessmentTool = tool;
+            tool.showFrameworkOverview();
+        } catch (error) {
+            console.error('Assessment initialization error:', error);
+            alert('Error loading framework. Please refresh the page and try again.');
+        }
     }
 }
 
 function showAllStages() {
     if (window.assessmentTool) {
         window.assessmentTool.showAllStagesOverview();
+    } else if (assessmentTool) {
+        assessmentTool.showAllStagesOverview();
     } else {
-        console.error('Assessment tool not initialized');
+        // Try to initialize now
+        try {
+            const tool = new AITransformationAssessment();
+            window.assessmentTool = tool;
+            assessmentTool = tool;
+            tool.showAllStagesOverview();
+        } catch (error) {
+            console.error('Assessment initialization error:', error);
+            alert('Error loading stages. Please refresh the page and try again.');
+        }
     }
 }
