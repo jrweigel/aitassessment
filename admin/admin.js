@@ -10,20 +10,55 @@ class AdminDashboard {
         this.currentPage = 1;
         this.itemsPerPage = 20;
         this.stageNames = ['', 'Unboxing & Assembling', 'Riding with Training Wheels', 'Training Wheels Off', 'Making the Bike Yours', 'Riding Without Thinking'];
+        this.sessionToken = null;
+        this.sessionExpiry = null;
+        this.sessionTimer = null;
         
         this.init();
     }
 
     async init() {
-        await this.loadData();
-        this.renderAdminDashboard();
-        this.bindEvents();
+        // Check if already authenticated
+        this.sessionToken = localStorage.getItem('admin-session-token');
+        this.sessionExpiry = localStorage.getItem('admin-session-expiry');
+        
+        if (this.sessionToken && this.sessionExpiry && Date.now() < parseInt(this.sessionExpiry)) {
+            // Valid session exists
+            this.showAuthenticatedState();
+            await this.loadData();
+            this.renderAdminDashboard();
+            this.bindEvents();
+            this.startSessionTimer();
+        } else {
+            // No valid session, show login
+            this.clearSession();
+            this.showLoginOverlay();
+            this.bindLoginEvents();
+        }
     }
 
     async loadData() {
         try {
-            // Try to load data from Azure API with admin access
-            const allData = await window.assessmentDataService.getAssessments({ admin: true });
+            // Try to load data from Azure API with admin access and session token
+            const response = await fetch('/api/get-assessments?admin=true', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Session-Token': this.sessionToken || ''
+                }
+            });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    // Session expired or invalid
+                    this.handleAuthError('Your session has expired. Please log in again.');
+                    return;
+                }
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            const allData = result.assessments || [];
+            
             console.log('Admin loadData:', allData.length, 'assessments found from Azure');
             
             // Filter for last 90 days for admin persistence
@@ -36,7 +71,12 @@ class AdminDashboard {
             });
             
         } catch (error) {
-            console.error('Failed to load admin data from Azure, falling back to localStorage:', error);
+            console.error('Failed to load admin data from Azure:', error);
+            
+            if (error.message.includes('401')) {
+                this.handleAuthError('Authentication failed. Please log in again.');
+                return;
+            }
             
             // Fallback to localStorage
             const storedData = localStorage.getItem('axe-ai-assessments');
@@ -417,6 +457,153 @@ class AdminDashboard {
         document.getElementById('export-detailed-csv')?.addEventListener('click', () => this.exportDetailedCSV());
         document.getElementById('export-manager-report')?.addEventListener('click', () => this.exportManagerReport());
         document.getElementById('clear-all-data')?.addEventListener('click', () => this.clearAllData());
+        
+        // Authentication events
+        document.getElementById('logout-btn')?.addEventListener('click', () => this.logout());
+    }
+
+    // Authentication methods
+    showLoginOverlay() {
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+
+    hideLoginOverlay() {
+        document.getElementById('login-overlay').style.display = 'none';
+    }
+
+    showAuthenticatedState() {
+        this.hideLoginOverlay();
+        document.body.classList.add('authenticated');
+        document.getElementById('session-status').style.display = 'block';
+    }
+
+    bindLoginEvents() {
+        const loginForm = document.getElementById('login-form');
+        const passwordInput = document.getElementById('admin-password');
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.authenticate(passwordInput.value);
+        });
+
+        // Allow Enter key to submit
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    }
+
+    async authenticate(password) {
+        const submitBtn = document.getElementById('login-submit');
+        const errorDiv = document.getElementById('login-error');
+        const originalText = submitBtn.textContent;
+
+        try {
+            submitBtn.textContent = 'Verifying...';
+            submitBtn.disabled = true;
+            errorDiv.style.display = 'none';
+
+            const response = await fetch('/api/verify-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Store session data
+                this.sessionToken = result.sessionToken;
+                this.sessionExpiry = Date.now() + result.expiresIn;
+                
+                localStorage.setItem('admin-session-token', this.sessionToken);
+                localStorage.setItem('admin-session-expiry', this.sessionExpiry.toString());
+
+                // Show authenticated state
+                this.showAuthenticatedState();
+                this.startSessionTimer();
+
+                // Load admin data
+                await this.loadData();
+                this.renderAdminDashboard();
+                this.bindEvents();
+
+            } else {
+                this.showLoginError(result.error || 'Authentication failed');
+            }
+
+        } catch (error) {
+            console.error('Authentication error:', error);
+            this.showLoginError('Unable to verify password. Please try again.');
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    showLoginError(message) {
+        const errorDiv = document.getElementById('login-error');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+
+    handleAuthError(message) {
+        this.clearSession();
+        alert(message);
+        this.showLoginOverlay();
+        this.bindLoginEvents();
+    }
+
+    logout() {
+        if (confirm('Are you sure you want to log out?')) {
+            this.clearSession();
+            window.location.reload();
+        }
+    }
+
+    clearSession() {
+        this.sessionToken = null;
+        this.sessionExpiry = null;
+        localStorage.removeItem('admin-session-token');
+        localStorage.removeItem('admin-session-expiry');
+        
+        if (this.sessionTimer) {
+            clearInterval(this.sessionTimer);
+            this.sessionTimer = null;
+        }
+        
+        document.body.classList.remove('authenticated');
+        document.getElementById('session-status').style.display = 'none';
+    }
+
+    startSessionTimer() {
+        if (this.sessionTimer) {
+            clearInterval(this.sessionTimer);
+        }
+
+        this.sessionTimer = setInterval(() => {
+            const remaining = parseInt(this.sessionExpiry) - Date.now();
+            
+            if (remaining <= 0) {
+                this.handleAuthError('Your session has expired. Please log in again.');
+                return;
+            }
+
+            const minutes = Math.floor(remaining / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            
+            document.getElementById('session-timer').textContent = 
+                `Session expires in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // Warn when 5 minutes remaining
+            if (remaining <= 5 * 60 * 1000 && remaining > 4 * 60 * 1000) {
+                this.showNotification('Session expires in 5 minutes', 'warning');
+            }
+        }, 1000);
     }
 
     filterData() {
@@ -436,6 +623,10 @@ class AdminDashboard {
     }
 
     async refreshData() {
+        if (!this.sessionToken) {
+            this.handleAuthError('Please log in to refresh data.');
+            return;
+        }
         await this.loadData();
         this.renderAdminDashboard();
     }

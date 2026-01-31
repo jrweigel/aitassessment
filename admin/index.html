@@ -7,9 +7,118 @@
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../dashboard.css">
     <link rel="stylesheet" href="../admin-styles.css">
+    <style>
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .login-modal {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .login-modal h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .login-modal input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .login-actions {
+            margin-top: 1rem;
+        }
+        .login-actions button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .login-actions button:hover {
+            background: #1d4ed8;
+        }
+        .login-error {
+            color: #dc2626;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .session-status {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #16a34a;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+        .session-timer {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+        body.authenticated .session-status {
+            display: block !important;
+        }
+        body.authenticated main {
+            margin-top: 60px;
+        }
+    </style>
     <!-- Force refresh for deployment -->
 </head>
 <body>
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-modal">
+            <h2>🔒 Admin Access Required</h2>
+            <p>Enter the admin password to access sensitive employee data:</p>
+            <form id="login-form">
+                <input type="password" id="admin-password" placeholder="Enter admin password" required>
+                <div class="login-actions">
+                    <button type="submit" id="login-submit">Access Admin Panel</button>
+                </div>
+                <div id="login-error" class="login-error" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Session Status Bar -->
+    <div id="session-status" class="session-status" style="display: none;">
+        <span id="session-info">Authenticated</span>
+        <button id="logout-btn" class="logout-btn">Logout</button>
+        <div id="session-timer" class="session-timer"></div>
+    </div>
+
     <header>
         <h1>AX&E AI Transformation - Admin View</h1>
         <p class="subtitle">Internal tracking with manager names and detailed analytics</p>

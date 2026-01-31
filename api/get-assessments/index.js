@@ -49,6 +49,47 @@ module.exports = async function (context, req) {
         const url = new URL(`http://localhost${req.url}`);
         const adminView = url.searchParams.get('admin') === 'true';
         const sessionId = url.searchParams.get('sessionId');
+        const sessionToken = req.headers['x-session-token'];
+        
+        // For admin view, require valid session token
+        if (adminView && !sessionToken) {
+            context.res.status = 401;
+            context.res.body = JSON.stringify({ 
+                success: false,
+                error: 'Admin access requires authentication',
+                code: 'AUTH_REQUIRED'
+            });
+            return;
+        }
+        
+        // Validate session token for admin requests
+        if (adminView && sessionToken) {
+            // Simple validation: check if token is recent (within 30 minutes)
+            try {
+                const tokenData = Buffer.from(sessionToken, 'base64').toString();
+                const [timestamp] = tokenData.split('_');
+                const tokenAge = Date.now() - parseInt(timestamp);
+                const maxAge = 30 * 60 * 1000; // 30 minutes
+                
+                if (tokenAge > maxAge) {
+                    context.res.status = 401;
+                    context.res.body = JSON.stringify({ 
+                        success: false,
+                        error: 'Session expired',
+                        code: 'SESSION_EXPIRED'
+                    });
+                    return;
+                }
+            } catch (tokenError) {
+                context.res.status = 401;
+                context.res.body = JSON.stringify({ 
+                    success: false,
+                    error: 'Invalid session token',
+                    code: 'INVALID_TOKEN'
+                });
+                return;
+            }
+        }
 
         context.log('Retrieving from Azure Tables using SDK...');
         
