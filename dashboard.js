@@ -150,7 +150,7 @@ class TransformationDashboard {
         
         this.assessmentData.forEach(assessment => {
             const team = assessment.axeTeam;
-            const stage = assessment.suggestedStage;
+            const stage = assessment.assessedStage || assessment.suggestedStage;
             
             if (!stats[team]) {
                 stats[team] = { total: 0, stages: {} };
@@ -217,7 +217,7 @@ class TransformationDashboard {
         const counts = {};
         
         this.assessmentData.forEach(assessment => {
-            const stage = assessment.suggestedStage;
+            const stage = assessment.assessedStage || assessment.suggestedStage;
             counts[stage] = (counts[stage] || 0) + 1;
         });
         
@@ -237,16 +237,18 @@ class TransformationDashboard {
             return;
         }
         
-        const timelineHtml = recentAssessments.map(assessment => `
+        const timelineHtml = recentAssessments.map(assessment => {
+            const stage = assessment.assessedStage || assessment.suggestedStage;
+            return `
             <div class="timeline-item">
                 <div class="timeline-date">${new Date(assessment.timestamp).toLocaleDateString()}</div>
                 <div class="timeline-team">${assessment.axeTeam}</div>
                 <div class="timeline-stage">
-                    <span class="stage-indicator stage-${assessment.suggestedStage}"></span>
-                    Stage ${assessment.suggestedStage}: ${this.stageNames[assessment.suggestedStage]}
+                    <span class="stage-indicator stage-${stage}"></span>
+                    Stage ${stage}: ${this.stageNames[stage]}
                 </div>
             </div>
-        `).join('');
+        `}).join('');
         
         timeline.innerHTML = timelineHtml;
     }
